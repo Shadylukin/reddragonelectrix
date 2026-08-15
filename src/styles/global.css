@@ -576,3 +576,6 @@ section { padding-block: 52px; }
   margin-left: auto; background: none; border: 0; color: var(--red-lite);
   font: inherit; font-size: 14.5px; cursor: pointer; min-height: 44px; padding: 0 4px;
 }
+
+/* the CTA line that used to live inside the h1 — same look, correct semantics */
+.h1-cta { color: var(--red); margin: 0; }

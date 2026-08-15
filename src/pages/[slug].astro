@@ -43,7 +43,12 @@ const lead = reviews[0]
         </div>
         <div class="hero-body">
           {/* Exactly one h1 per page. The old site had three on some pages. */}
-          <h1 class="h1">{service.title}<span class="accent">Ring Nick.</span></h1>
+          {/* The h1 is the page's subject and nothing else. "Ring Nick" is a
+              call to action, not a heading — glued into the h1 it read as
+              "EV Charger Installation Ring Nick." to anything parsing text,
+              which includes Google. */}
+          <h1 class="h1">{service.title}</h1>
+          <p class="h1 h1-cta">Ring Nick.</p>
           <p class="hero-sub">{service.description}</p>
           <p class="credentials">
             <b>EWRB</b> registered<span class="sep">·</span>
