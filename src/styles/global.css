@@ -454,3 +454,8 @@ section { padding-block: 52px; }
     scroll-behavior: auto !important;
   }
 }
+
+/* ---------- EV detail + paper install spec ---------- */
+.ev-grid { display: grid; gap: 26px; }
+@media (min-width: 1000px) { .ev-grid { grid-template-columns: 1.15fr .85fr; gap: 48px; align-items: start; } }
+.ev-grid .paper img { border: 1px solid var(--rule-ink); }

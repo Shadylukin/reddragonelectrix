@@ -4,7 +4,7 @@ import Header from '../components/Header.astro'
 import Footer from '../components/Footer.astro'
 import CallBar from '../components/CallBar.astro'
 import PlateLabel from '../components/PlateLabel.astro'
-import { site, services, reviews } from '../data/site'
+import { site, services, reviews, jobLog, evInstallSpec } from '../data/site'
 
 const title = 'EV Charger Installation Auckland | Red Dragon Electrix'
 const description =
@@ -131,6 +131,53 @@ const prompts: Record<string, string> = {
       </div>
     </section>
 
+    <!-- 04 EV DETAIL + INSTALL SPEC — the first paper register shift.
+         tesla-charger.jpg is a studio shot on a near-white seamless. Forced onto
+         black it punches a glowing hole; given its own document card it reads as
+         intentional. -->
+    <section class="wrap">
+      <PlateLabel idx="04" name="EV charging" note="Manufacturer-trained, incl. Tesla" />
+      <div class="ev-grid">
+        <div>
+          <h2 class="h2">The supply gets checked before anything goes on the wall</h2>
+          <p class="lede">
+            Most EV charger jobs are decided before a single hole is drilled. What the main
+            supply can carry, whether the board has room, how far the run is from the board
+            to where the car actually parks. Get that wrong and you either trip the house
+            every time the car charges, or you pay for a board upgrade you didn't need.
+          </p>
+          <p class="lede">
+            Text a photo of your switchboard and where you park. Most of the time that's
+            enough to quote it without a visit.
+          </p>
+          <a class="plate-call" href={`sms:${site.phone.e164}`} style="margin-top:22px;max-width:420px">
+            <span class="prompt">Got the car on order? Ring me before the charger arrives.</span>
+            <span class="row">
+              <span class="l">TEXT A PHOTO</span>
+              <span class="d">{site.phone.display}</span>
+            </span>
+          </a>
+        </div>
+
+        <aside class="paper">
+          <div class="head">
+            <span class="l">Install spec</span>
+            <span class="r">EV wall charger</span>
+          </div>
+          <img src="/img/tesla-charger.jpg" alt="A Tesla wall connector installed on a wall"
+               width="2000" height="2000" loading="lazy" style="padding:14px 14px 0" />
+          <dl>
+            {evInstallSpec.map((s) => (
+              <div class="row"><dt>{s.term}</dt><dd>{s.value}</dd></div>
+            ))}
+          </dl>
+          <p class="fine">
+            Every other photograph on this page is our own work.
+          </p>
+        </aside>
+      </div>
+    </section>
+
     <!-- 05 JOB RECORD — the strongest trust asset in the set -->
     <section class="wrap">
       <PlateLabel idx="04" name="Job record" note="VIR rewire, Glen Eden" />
@@ -164,6 +211,23 @@ const prompts: Record<string, string> = {
             </p>
           </div>
         </div>
+      </div>
+    </section>
+
+    <!-- 06 JOB LOG — every tile captioned. The cheapest upgrade from
+         "photo grid" to "portfolio" there is. -->
+    <section class="wrap">
+      <PlateLabel idx="06" name="The job log" note="Recent work, Auckland" />
+      <div class="log">
+        {jobLog.map((j) => (
+          <figure>
+            <img src={j.img} alt={`${j.job} — ${j.prop}`} width="800" height="800" loading="lazy" />
+            <figcaption>
+              <span class="job">{j.job}</span>
+              <span class="loc">{j.suburb ? `${j.prop}, ${j.suburb}` : j.prop}</span>
+            </figcaption>
+          </figure>
+        ))}
       </div>
     </section>
 

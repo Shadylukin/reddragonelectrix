@@ -136,6 +136,41 @@ export const services = [
   },
 ] as const
 
+/**
+ * The job log. Captions describe only what is visibly in each photograph —
+ * no invented suburbs, no invented client names. `suburb` is null until Nick
+ * confirms where each job actually was; the caption degrades gracefully.
+ *
+ * The panel's point stands: captioning is the cheapest upgrade there is from
+ * "photo grid" to "portfolio". But a made-up suburb is a lie on a real
+ * business's website, so these stay null until he tells us.
+ */
+export const jobLog = [
+  { img: '/img/ev-charger.jpg',      job: 'EV charger installation',   prop: 'Home garage',        suburb: null as string | null },
+  { img: '/img/interior.jpg',        job: 'Interior lighting',         prop: 'Residential',        suburb: null as string | null },
+  { img: '/img/commercial.jpg',      job: 'Commercial lighting',       prop: 'Retail fit-out',     suburb: null as string | null },
+  { img: '/img/outdoor-lighting.jpg', job: 'Exterior lighting',        prop: 'Residential',        suburb: null as string | null },
+  { img: '/img/oven.jpg',            job: 'Oven & rangehood install',  prop: 'Kitchen',            suburb: null as string | null },
+  { img: '/img/commercial-med.jpg',  job: 'Commercial electrical',     prop: 'Medical facility',   suburb: null as string | null },
+] as const
+
+/**
+ * Install spec for the EV paper card.
+ *
+ * Deliberately describes NICK'S INSTALL, not Tesla's product specification.
+ * Publishing manufacturer figures we cannot verify would put wrong numbers on
+ * a real electrician's website; what he does on site is his own to state.
+ */
+export const evInstallSpec = [
+  { term: 'Supply',        value: 'Single or 3-phase' },
+  { term: 'Circuit',       value: 'Dedicated, RCD protected' },
+  { term: 'Cable run',     value: 'Measured on site' },
+  { term: 'Certification', value: 'CoC issued' },
+  // TODO: Nick to confirm a standard install price. Until then this stays as a
+  // qualitative answer — an invented figure is worse than no figure.
+  { term: 'Typical install', value: 'Quoted from photos' },
+] as const
+
 /** Real reviews, verified 5-star in the old site's database. Do not edit the wording. */
 export const reviews = [
   {
