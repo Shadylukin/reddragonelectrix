@@ -67,19 +67,47 @@ async function triage(
   env: Env,
   e: Record<string, unknown>,
   photos: Photo[] = [],
-): Promise<{ summary: string; priority: string } | null> {
+): Promise<{ summary: string; priority: string; draftReply: string | null } | null> {
   if (!env.GEMINI_API_KEY) return null
 
-  const prompt = `You are triaging a job enquiry for a New Zealand electrician (Red Dragon Electrix, Auckland).
-
-Write a briefing for the electrician. He reads it on his phone between jobs.
+  const prompt = `You are triaging a job enquiry for Nick, a registered electrician in
+Auckland, New Zealand (Red Dragon Electrix). He reads this on his phone between jobs.
 
 RULES — these are absolute:
 - NEVER estimate, suggest or imply a price. You do not know his rates.
 - NEVER state whether the job is easy, hard, or how long it will take.
-- NEVER address the customer. You are writing to the electrician only.
-- If the enquiry is vague, say what he should ask, do not guess the answer.
-- Plain New Zealand English. No marketing language. Short.
+- If the enquiry is vague, say what he should ask. Do not guess the answer.
+- No marketing language. Short.
+
+NEW ZEALAND TRADE ENGLISH — get this right, he will notice immediately:
+- NZ spelling throughout: specialise, organise, recognise, metre, colour,
+  labour, licence (noun). Never the American -ize or -er forms.
+- NZ trade vocabulary, not American:
+    switchboard        NOT breaker panel / electrical panel / load centre
+    power point        NOT outlet / receptacle
+    RCD                NOT GFCI
+    RCBO, MCB          NOT breaker (on its own)
+    mains / supply     NOT service
+    meter box          NOT meter can
+    Certificate of Compliance (CoC), ESC   the NZ compliance documents
+    AS/NZS 3000        the NZ wiring standard
+    VIR, TPS           the cable types he actually deals with
+    sparky             an electrician. Normal usage here, not slang.
+    section            NOT yard
+    torch              NOT flashlight
+- Tone: plain, direct, understated. How one tradesman writes to another.
+- DO NOT perform Kiwi-ness. No "sweet as", no "chur", no "bro", no "she'll be
+  right". Laying slang on thick reads as a machine imitating a New Zealander and
+  is worse than neutral English. The goal is simply to not sound American.
+- BANNED PHRASES — corporate American, and a tradesman would never write them:
+    "reaching out" / "reach out"     say: getting in touch, or just "thanks for the message"
+    "touch base", "circle back"      say: give you a ring, get back to you
+    "at your earliest convenience"   say: when you get a chance
+    "please do not hesitate to"      say: just give me a ring
+    "I hope this email finds you"    delete it entirely
+    "utilise", "leverage"            say: use
+  Openers that do work: "Thanks for the message", "Thanks for getting in touch",
+  "Gidday" if it suits, or simply start with the answer. Sign off "Cheers, Nick".
 
 Assign a priority:
   urgent   — a safety issue, whether the customer described one OR you can SEE one.
@@ -123,7 +151,26 @@ the car sits. Rules for this line, absolute:
 - Nick is looking at the same photograph. You are saving him a squint, not making
   a judgement for him.` : ''}
 
-Reply as JSON only: {"summary": "...", "priority": "urgent|standard|info"}`
+ALSO WRITE A DRAFT REPLY for Nick to send the customer.
+
+60% of enquiries arrive outside working hours, most of them between 5pm and
+midnight — when he cannot ring but can tap out a reply from the couch. Speed of
+first response wins jobs in the trades. This is a DRAFT: he reads it, changes
+whatever he likes, and sends it himself from his own phone. Nothing you write
+reaches a customer unless he sends it.
+
+Rules for the draft:
+- 3 or 4 sentences. If it is longer than he would type himself, it has failed.
+- Write AS NICK, first person. Sign off "Nick".
+- Absolutely no prices, no timeframes, no commitments about what the job needs.
+- Ask for the ONE or TWO specific things he is missing to price it. If nothing is
+  missing, say he will come back with a price.
+- If you flagged this urgent, the draft says he will ring shortly and tells them
+  to ring 111 if there is smoke or sparking. Do not ask a rusty-switchboard
+  customer to answer questions by email.
+- Plain text. It gets pasted into a text message or an email.
+
+Reply as JSON only: {"summary": "...", "priority": "urgent|standard|info", "draftReply": "..."}`
 
   try {
     const ctl = new AbortController()
@@ -147,8 +194,12 @@ Reply as JSON only: {"summary": "...", "priority": "urgent|standard|info"}`
             responseMimeType: 'application/json',
             responseSchema: {
               type: 'OBJECT',
-              properties: { summary: { type: 'STRING' }, priority: { type: 'STRING' } },
-              required: ['summary', 'priority'],
+              properties: {
+                summary: { type: 'STRING' },
+                priority: { type: 'STRING' },
+                draftReply: { type: 'STRING' },
+              },
+              required: ['summary', 'priority', 'draftReply'],
             },
           },
         }),
@@ -161,13 +212,21 @@ Reply as JSON only: {"summary": "...", "priority": "urgent|standard|info"}`
     if (!text) return null
     const parsed = JSON.parse(text)
     const priority = ['urgent', 'standard', 'info'].includes(parsed.priority) ? parsed.priority : 'standard'
-    return { summary: String(parsed.summary).slice(0, 1500), priority }
+    return {
+      summary: String(parsed.summary).slice(0, 1500),
+      priority,
+      draftReply: parsed.draftReply ? String(parsed.draftReply).slice(0, 1200) : null,
+    }
   } catch {
     return null
   }
 }
 
-function buildEmail(e: Record<string, unknown>, ai: { summary: string; priority: string } | null, id: string) {
+function buildEmail(
+  e: Record<string, unknown>,
+  ai: { summary: string; priority: string; draftReply: string | null } | null,
+  id: string,
+) {
   const flag = ai?.priority === 'urgent' ? '[URGENT] ' : ''
   const subject = `${flag}Website enquiry — ${e.jobType ?? 'general'} — ${e.name ?? 'no name'}`
   const lines = [
@@ -190,7 +249,18 @@ function buildEmail(e: Record<string, unknown>, ai: { summary: string; priority:
     )
   }
   if (Number(e.photoCount) > 0) lines.push(`Photos:  ${e.photoCount} attached to this email`)
-  lines.push('', 'Message:', String(e.message ?? '-'), '', `Ref: ${id}`)
+  lines.push('', 'Message:', String(e.message ?? '-'))
+  if (ai?.draftReply) {
+    lines.push(
+      '',
+      '--- SUGGESTED REPLY — copy, change what you like, send it yourself ---',
+      '',
+      ai.draftReply,
+      '',
+      '--- end of suggested reply ---',
+    )
+  }
+  lines.push('', `Ref: ${id}`)
   return { subject, body: lines.join('\n') }
 }
 
@@ -272,8 +342,14 @@ export const onRequestPost: PagesFunction<Env> = async (ctx) => {
       const ai = await triage(env, e, photos)
       try {
         await env.DB.prepare(
-          `UPDATE enquiries SET ai_summary=?, ai_priority=?, ai_status=? WHERE id=?`,
-        ).bind(ai?.summary ?? null, ai?.priority ?? null, ai ? 'ok' : (env.GEMINI_API_KEY ? 'failed' : 'skipped'), id).run()
+          `UPDATE enquiries SET ai_summary=?, ai_priority=?, ai_draft=?, ai_status=? WHERE id=?`,
+        ).bind(
+          ai?.summary ?? null,
+          ai?.priority ?? null,
+          ai?.draftReply ?? null,
+          ai ? 'ok' : (env.GEMINI_API_KEY ? 'failed' : 'skipped'),
+          id,
+        ).run()
       } catch { /* the enquiry is already safe */ }
 
       const { subject, body } = buildEmail(e, ai, id)

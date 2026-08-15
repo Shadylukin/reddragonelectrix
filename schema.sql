@@ -55,3 +55,7 @@ FROM enquiries;
 -- Added Aug 2026: consent to text back. The old form never even asked for a
 -- phone number, let alone permission to use it.
 ALTER TABLE enquiries ADD COLUMN ok_to_text INTEGER DEFAULT 0;
+
+-- Added Aug 2026: the suggested reply Nick can copy, change and send himself.
+-- Stored as well as emailed so it survives a lost or spam-foldered notification.
+ALTER TABLE enquiries ADD COLUMN ai_draft TEXT;
