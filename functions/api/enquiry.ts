@@ -301,7 +301,9 @@ function buildEmail(
       rule, '', ai.draftReply, '', rule)
   }
 
-  L.push('', rule, '', '— Alice')
+  // The draft block already closes with a rule; don't draw a second one.
+  if (!ai?.draftReply) L.push('', rule)
+  L.push('', '— Alice')
   L.push('I read the enquiries as they come in and write these up for you.')
   L.push("I'm software, so there's no need to reply to me — just get back to them.")
   if (!ai) {
