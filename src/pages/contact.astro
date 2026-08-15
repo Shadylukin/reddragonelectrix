@@ -27,7 +27,7 @@ const description = `Call Red Dragon Electrix on ${site.phone.display}, or text 
           </a>
           <div class="close-sub">
             <a href={`sms:${site.phone.e164}`}><span>Or text a photo of the problem</span></a>
-            <a href={`mailto:${site.email}?subject=Website%20enquiry`}><span>{site.email}</span></a>
+            <!--email_off--><a href={`mailto:${site.email}?subject=Website%20enquiry`}><span>{site.email}</span></a><!--/email_off-->
           </div>
           <p class="honest">
             On a busy week you might not get Nick first ring — someone's usually up a ladder.
@@ -37,7 +37,7 @@ const description = `Call Red Dragon Electrix on ${site.phone.display}, or text 
         </div>
         <dl class="schedule">
           <div class="row"><dt>Phone</dt><dd>{site.phone.display}</dd></div>
-          <div class="row"><dt>Email</dt><dd>{site.email}</dd></div>
+          <div class="row"><dt>Email</dt><dd><!--email_off-->{site.email}<!--/email_off--></dd></div>
           <div class="row"><dt>Hours</dt><dd>{site.openingHoursDisplay}</dd></div>
           <div class="row"><dt>Based</dt><dd>{site.address.locality}, {site.address.region}</dd></div>
           <div class="row"><dt>Covering</dt><dd>All Auckland</dd></div>
