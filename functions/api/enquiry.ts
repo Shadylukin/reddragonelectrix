@@ -82,9 +82,21 @@ RULES — these are absolute:
 - Plain New Zealand English. No marketing language. Short.
 
 Assign a priority:
-  urgent   — a described safety issue: burning smell, sparking, smoke, shock, no power
-  standard — a real job enquiry
+  urgent   — a safety issue, whether the customer described one OR you can SEE one.
+             Text: burning smell, sparking, smoke, shock, no power.
+             Photos: visible burning or scorching, exposed or bare conductors,
+             heavy corrosion or water damage, components hanging loose, an
+             enclosure that will not close, obvious heat damage.
+             The customer often does not know what they are looking at — that is
+             why they are ringing an electrician. If the photo looks bad to you,
+             flag it urgent even if the words are calm. Nick would rather look at
+             a board that turned out fine than miss one that did not.
+  standard — a real job enquiry with nothing alarming in the words or the photos
   info     — a question, a sales approach, spam, or nothing actionable
+
+This flag is an internal triage signal for Nick, who is a registered electrician
+looking at the same photograph. It is never shown to the customer, so raising it
+costs nothing but Nick's attention and missing it can cost a great deal more.
 
 ENQUIRY
 name: ${e.name ?? '(not given)'}
