@@ -24,10 +24,17 @@ export const site = {
   // Final position: registered Auckland electrician WHO SPECIALISES in EV. Both. The EV
   // page stays strong; it is the differentiator and it is evidence for his Tesla
   // reapplication.
+  // The headline stays a sentence a person would actually say — that is what the
+  // design panel rated above every "EXPERIENCED AUCKLAND ELECTRICIANS" in the sector.
+  // But it is now plural: Nick asked for it to be known there is a team, and the h1
+  // was the loudest thing on the site still saying otherwise.
+  //
+  // His name stays on the call buttons. A customer having someone to ask for is warm
+  // and specific; the headline implying he works alone is the thing he objected to.
   tagline: 'Need a sparky in Auckland?',
-  taglineAccent: 'Ring Nick.',
+  taglineAccent: 'Give us a ring.',
   taglineSecondary:
-    "Registered electrician, Glen Eden. Switchboards, rewires and lighting — and Auckland's EV charger specialist.",
+    "Registered electricians out of Te Atatū. Switchboards, rewires and lighting — and Auckland's EV charger specialists.",
   description:
     'Manufacturer-trained EV charger installation across Auckland, including Tesla wall connectors. Plus switchboards, rewires, lighting and power points for homes and businesses.',
   url: 'https://reddragonelectrix.co.nz',
@@ -55,12 +62,16 @@ export const site = {
 
   facebook: 'https://www.facebook.com/reddragonelectrix',
 
+  // Confirmed from the Google Business Profile, Aug 2026. The old site said
+  // "Matama Road, Glen Eden" with no street number, and directory listings had a
+  // third address again — three addresses across two suburbs. This is the one
+  // Google holds, so this is the one everything else should match.
   address: {
-    locality: 'Glen Eden',
+    street: '109A Roberts Road',
+    locality: 'Te Atatū South',
     region: 'Auckland',
+    postcode: '0610',
     country: 'NZ',
-    // Old site said "Matama Road, Glen Eden" with no street number.
-    street: null as string | null, // TODO: confirm with Nick, or omit entirely
   },
 
   // The old site never named a single suburb anywhere — verified across the whole database.
@@ -69,7 +80,7 @@ export const site = {
   areaServed: ['Auckland', 'West Auckland', 'North Shore', 'Central Auckland'],
   suburbs: [
     // West
-    'Glen Eden', 'Titirangi', 'Henderson', 'Te Atatū', 'Swanson', 'Ranui', 'Avondale',
+    'Te Atatū', 'Glen Eden', 'Titirangi', 'Henderson', 'Swanson', 'Ranui', 'Avondale',
     'Blockhouse Bay', 'New Lynn', 'Massey',
     // Northwest / North
     'Hobsonville', 'Westgate', 'Northcote',
@@ -92,18 +103,17 @@ export const site = {
   insured: null as boolean | null,
   insuranceCover: null as string | null,
 
-  // Google Business Profile rating. Nick recalled "close to 50 at 5 star"; directory
-  // listings show 4.8 from 44, which is the number to use — five times the volume of
-  // the old site's 9, and an average that reads as human rather than curated.
-  // TODO: confirm against the Google Business Profile directly.
+  // Confirmed from the Google Business Profile itself, Aug 2026: 4.9 from 56.
+  // Directory aggregators had 4.8/44, which was stale. Nick's recollection of
+  // "close to 50 at 5 star" was closer than either.
   //
   // The old site showed 5.0 from 9. Those 9 came from the Site Reviews plugin and were
   // most likely the Facebook reviews (Facebook shows 100% recommended from 9), not
   // Google's.
   rating: {
-    value: '4.8',
+    value: '4.9',
     best: 5,
-    count: 44,
+    count: 56,
   },
 } as const
 
