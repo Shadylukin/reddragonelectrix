@@ -1,0 +1,24 @@
+name = "reddragon-electrix"
+compatibility_date = "2026-08-01"
+compatibility_flags = ["nodejs_compat"]
+pages_build_output_dir = "dist"
+
+# Enquiry storage. Written to BEFORE the model call and BEFORE the email, so a
+# failure downstream can never lose an enquiry the way the old site did.
+[[d1_databases]]
+binding = "DB"
+database_name = "rde-enquiries"
+database_id = "e2b496de-b1cf-48cf-80d6-a2e68b77a47f"
+
+# NOTE: Cloudflare Pages does not support the [[send_email]] binding — that is a
+# Workers-only feature. Notification therefore goes out over HTTP via Resend,
+# which also fixes the deliverability problem the old site had (it sent as
+# wordpress@reddragonelectrix.co.nz from a server with no authority to, which is
+# a spam-folder machine).
+#
+# If RESEND_API_KEY is absent the endpoint still works: the enquiry is stored in
+# D1 and notify_status is recorded as 'skipped'. Nothing is ever lost.
+#
+# Secrets are NOT set here — the repo is public:
+#   wrangler pages secret put GEMINI_API_KEY --project-name=reddragon-electrix
+#   wrangler pages secret put RESEND_API_KEY --project-name=reddragon-electrix

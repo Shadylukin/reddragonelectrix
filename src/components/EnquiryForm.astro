@@ -1,0 +1,133 @@
+---
+import { site } from '../data/site'
+interface Props { defaultJobType?: 'ev' | 'residential' | 'commercial' }
+const { defaultJobType = 'ev' } = Astro.props
+---
+
+<form class="enq" id="enq" novalidate>
+  <div class="enq-head">
+    <span class="l">Enquiry</span>
+    <span class="r">Answered 7am – 7pm</span>
+  </div>
+
+  <div class="enq-body">
+    <p class="enq-intro">
+      Ringing is faster — <a href={site.phone.href}>{site.phone.display}</a>. But if you'd
+      rather type it out, this gets Nick what he needs to price it without a visit.
+    </p>
+
+    <fieldset class="enq-row">
+      <legend>What's the job?</legend>
+      <div class="chips">
+        <label><input type="radio" name="jobType" value="ev" checked={defaultJobType === 'ev'} /><span>EV charger</span></label>
+        <label><input type="radio" name="jobType" value="residential" checked={defaultJobType === 'residential'} /><span>Home</span></label>
+        <label><input type="radio" name="jobType" value="commercial" checked={defaultJobType === 'commercial'} /><span>Business</span></label>
+        <label><input type="radio" name="jobType" value="other" /><span>Something else</span></label>
+      </div>
+    </fieldset>
+
+    <!-- EV qualification. These four answers are what decides the price, and
+         they are the ones customers never volunteer. Shown only for EV. -->
+    <div id="ev-fields" class="enq-ev">
+      <div class="enq-grid">
+        <label class="f"><span>What car?</span><input name="evVehicle" placeholder="Tesla Model 3, BYD, not sure yet" autocomplete="off" /></label>
+        <label class="f"><span>Charger, if you have one</span><input name="evCharger" placeholder="Tesla Gen 3, or not bought yet" autocomplete="off" /></label>
+        <label class="f"><span>Roughly how far is the switchboard from where you park?</span><input name="evDistance" placeholder="About 8 metres, other side of the house…" autocomplete="off" /></label>
+        <label class="f"><span>Property</span>
+          <select name="evProperty">
+            <option value="">Choose…</option>
+            <option>Standalone house</option>
+            <option>Terrace / townhouse</option>
+            <option>Apartment</option>
+            <option>Body corporate</option>
+            <option>Commercial site</option>
+          </select>
+        </label>
+      </div>
+      <p class="enq-hint">
+        Don't know? Leave it blank and text a photo of your switchboard to
+        <a href={`sms:${site.phone.e164}`}>{site.phone.display}</a> — that's usually enough.
+      </p>
+    </div>
+
+    <div class="enq-grid">
+      <label class="f"><span>Your name</span><input name="name" autocomplete="name" /></label>
+      <label class="f"><span>Suburb</span><input name="suburb" placeholder="Glen Eden, Hobsonville…" autocomplete="address-level2" /></label>
+      <label class="f"><span>Phone</span><input name="phone" type="tel" inputmode="tel" autocomplete="tel" /></label>
+      <label class="f"><span>Email</span><input name="email" type="email" inputmode="email" autocomplete="email" /></label>
+    </div>
+
+    <label class="f"><span>What's going on?</span>
+      <textarea name="message" rows="4" placeholder="As much or as little as you like."></textarea>
+    </label>
+
+    <!-- honeypot: a real person never sees or fills this -->
+    <div class="enq-hp" aria-hidden="true">
+      <label>Company<input name="company" tabindex="-1" autocomplete="off" /></label>
+    </div>
+
+    <p class="enq-note">Nick needs a phone number or an email to get back to you.</p>
+
+    <button type="submit" class="enq-submit">
+      <span class="l">SEND TO NICK</span>
+      <span class="d">Send enquiry</span>
+    </button>
+
+    <p class="enq-status" id="enq-status" role="status" aria-live="polite"></p>
+  </div>
+</form>
+
+<script>
+  const form = document.getElementById('enq') as HTMLFormElement | null
+  if (form) {
+    const status = document.getElementById('enq-status')!
+    const evFields = document.getElementById('ev-fields')!
+    const btn = form.querySelector('.enq-submit') as HTMLButtonElement
+
+    const syncEv = () => {
+      const v = (form.querySelector('input[name=jobType]:checked') as HTMLInputElement)?.value
+      evFields.hidden = v !== 'ev'
+    }
+    form.querySelectorAll('input[name=jobType]').forEach((r) => r.addEventListener('change', syncEv))
+    syncEv()
+
+    form.addEventListener('submit', async (ev) => {
+      ev.preventDefault()
+      const fd = new FormData(form)
+      const payload: Record<string, unknown> = Object.fromEntries(fd.entries())
+      payload.sourcePage = location.pathname
+
+      if (!String(payload.phone ?? '').trim() && !String(payload.email ?? '').trim()) {
+        status.textContent = 'Please add a phone number or an email so Nick can reply.'
+        status.className = 'enq-status err'
+        return
+      }
+
+      btn.disabled = true
+      status.textContent = 'Sending…'
+      status.className = 'enq-status'
+
+      try {
+        const r = await fetch('/api/enquiry', {
+          method: 'POST',
+          headers: { 'content-type': 'application/json' },
+          body: JSON.stringify(payload),
+        })
+        const data = await r.json()
+        if (data.ok) {
+          form.querySelector('.enq-body')!.innerHTML =
+            `<p class="enq-done"><strong>Got it.</strong> Nick will come back to you — usually same day.` +
+            ` If it's urgent, ring him on <a href="tel:+642109186333">0210 918 6333</a>.</p>`
+        } else {
+          status.textContent = data.error || 'Something went wrong. Please ring Nick on 0210 918 6333.'
+          status.className = 'enq-status err'
+          btn.disabled = false
+        }
+      } catch {
+        status.textContent = 'Could not send that. Please ring Nick on 0210 918 6333.'
+        status.className = 'enq-status err'
+        btn.disabled = false
+      }
+    })
+  }
+</script>

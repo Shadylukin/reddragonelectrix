@@ -4,6 +4,7 @@ import Header from '../components/Header.astro'
 import Footer from '../components/Footer.astro'
 import CallBar from '../components/CallBar.astro'
 import PlateLabel from '../components/PlateLabel.astro'
+import EnquiryForm from '../components/EnquiryForm.astro'
 import { site } from '../data/site'
 const title = `Contact | ${site.name}`
 const description = `Call Red Dragon Electrix on ${site.phone.display}, or text a photo of the problem. Registered electricians covering all of Auckland, open ${site.openingHoursDisplay}.`
@@ -31,9 +32,7 @@ const description = `Call Red Dragon Electrix on ${site.phone.display}, or text 
             On a busy week you might not get him first ring — he's usually up a ladder.
             Leave a message or text a photo of what's going on and he'll come back to you.
           </p>
-          {/* TODO: enquiry form goes here once the mail path is settled AND monitored.
-              The old form silently died in April 2024 and nobody noticed for 28 months —
-              this one does not ship without an alert on it. */}
+          <EnquiryForm defaultJobType="ev" />
         </div>
         <dl class="schedule">
           <div class="row"><dt>Phone</dt><dd>{site.phone.display}</dd></div>
