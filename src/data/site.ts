@@ -92,10 +92,18 @@ export const site = {
   insured: null as boolean | null,
   insuranceCover: null as string | null,
 
+  // Google Business Profile rating. Nick recalled "close to 50 at 5 star"; directory
+  // listings show 4.8 from 44, which is the number to use — five times the volume of
+  // the old site's 9, and an average that reads as human rather than curated.
+  // TODO: confirm against the Google Business Profile directly.
+  //
+  // The old site showed 5.0 from 9. Those 9 came from the Site Reviews plugin and were
+  // most likely the Facebook reviews (Facebook shows 100% recommended from 9), not
+  // Google's.
   rating: {
-    value: 5,
+    value: '4.8',
     best: 5,
-    count: 9, // verified: wphx_glsr_ratings, 9 rows, all rated 5
+    count: 44,
   },
 } as const
 

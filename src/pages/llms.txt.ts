@@ -34,7 +34,7 @@ Run by Nick with a team of registered electricians. Trading as ${site.name}.
 - Certificate of Compliance issued on every job, as required by New Zealand regulations
 - All work to AS/NZS 3000:2018, the current New Zealand wiring standard
 - Manufacturer-trained for EV charger installation, including Tesla Wall Connectors
-- Rated ${site.rating.value}.0 out of ${site.rating.best} from ${site.rating.count} customer reviews
+- Rated ${site.rating.value} out of ${site.rating.best} from ${site.rating.count} customer reviews
 
 ## Service area
 

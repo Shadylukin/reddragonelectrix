@@ -54,7 +54,7 @@ const prompts: Record<string, string> = {
             <b>EWRB</b> registered<span class="sep">·</span>
             <b>CoC</b> on every job<span class="sep">·</span>
             <b>AS/NZS 3000:2018</b><span class="sep">·</span>
-            <b>{site.rating.value}.0</b> from {site.rating.count} reviews
+            <b>{site.rating.value}</b> from {site.rating.count} reviews
           </p>
 
           <div class="doors">
@@ -73,21 +73,20 @@ const prompts: Record<string, string> = {
 
     <!-- 02 REVIEWS — deliberately at position two, on flat black between two photographic sections -->
     <section class="wrap">
-      <PlateLabel idx="02" name="What the neighbours said" note="Google reviews, unedited" />
-      <h2 class="h2">Nine people have left a review.<br />All nine gave five stars.</h2>
+      <PlateLabel idx="02" name="What the neighbours said" note="Customer reviews, unedited" />
+      <h2 class="h2">{site.rating.count} reviews.<br />Averaging {site.rating.value} out of 5.</h2>
       <p class="lede">
-        Which is a small enough number that you should read them rather than trust the average.
-        So here they are, word for word.
+        Averages are easy to claim, so here are some of them word for word — names and all.
       </p>
       <blockquote class="quote-lead" style="margin-top:26px">
         <p>{lead.body}</p>
-        <p class="attr"><span class="nm">{lead.author}</span> <span class="src">· Google review</span></p>
+        <p class="attr"><span class="nm">{lead.author}</span> <span class="src">· customer review</span></p>
       </blockquote>
       <div class="quote-grid">
         {rest.map((r) => (
           <blockquote>
             <p>{r.body}</p>
-            <p class="attr"><span class="nm">{r.author}</span> <span class="src">· Google review</span></p>
+            <p class="attr"><span class="nm">{r.author}</span> <span class="src">· customer review</span></p>
           </blockquote>
         ))}
       </div>
@@ -289,7 +288,7 @@ const prompts: Record<string, string> = {
           <div class="row"><dt>Hours</dt><dd>{site.openingHoursDisplay}</dd></div>
           <div class="row"><dt>Based</dt><dd>{site.address.locality}, {site.address.region}</dd></div>
           <div class="row"><dt>Covering</dt><dd>All Auckland</dd></div>
-          <div class="row"><dt>Reviews</dt><dd>{site.rating.value}.0 from {site.rating.count}</dd></div>
+          <div class="row"><dt>Reviews</dt><dd>{site.rating.value} from {site.rating.count}</dd></div>
         </dl>
       </div>
     </section>
