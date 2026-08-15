@@ -18,7 +18,7 @@ export const GET: APIRoute = () => {
 > ${site.description}
 
 Registered electrical contractor based in ${site.address.locality}, ${site.address.region}, New Zealand.
-Owner-operator: Nick. Trading as ${site.name}.
+Run by Nick with a team of registered electricians. Trading as ${site.name}.
 
 ## Contact
 

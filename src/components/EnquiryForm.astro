@@ -272,7 +272,7 @@ import { site } from '../data/site'
           if (photos.length) add('Photos', `${photos.length} sent`)
 
           root.querySelector('.enq-body')!.innerHTML =
-            `<p class="enq-done"><strong>Sent.</strong> Nick will come back to you — most enquiries get a call the same day.</p>
+            `<p class="enq-done"><strong>Sent.</strong> We\u2019ll come back to you — most enquiries get a call the same day.</p>
              <div class="enq-receipt">
                <div class="enq-receipt-head">
                  <span>What you sent</span>
@@ -280,7 +280,7 @@ import { site } from '../data/site'
                </div>
                <dl class="schedule">${rows.join('')}</dl>
              </div>
-             <p class="enq-done enq-done-sm">In a hurry, or something looks wrong above? Ring him on
+             <p class="enq-done enq-done-sm">In a hurry, or something looks wrong above? Give us a ring on
                <a href="tel:+642109186333">0210 918 6333</a>.</p>`
         } else {
           status.textContent = data.error || 'Something went wrong. Please ring Nick on 0210 918 6333.'

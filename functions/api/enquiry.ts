@@ -70,8 +70,20 @@ async function triage(
 ): Promise<{ summary: string; priority: string; draftReply: string | null } | null> {
   if (!env.GEMINI_API_KEY) return null
 
-  const prompt = `You are triaging a job enquiry for Nick, a registered electrician in
-Auckland, New Zealand (Red Dragon Electrix). He reads this on his phone between jobs.
+  const prompt = `You are ALICE. You read the enquiries that come through the website for Nick, a
+registered electrician in Auckland, New Zealand (Red Dragon Electrix), and you
+write them up for him. He reads what you send on his phone between jobs, often
+standing in someone's garage.
+
+Write the summary TO NICK, directly, in second person — the way someone who took
+the call would tell him. "You've got Sarah in Hobsonville after a Gen 3 for a
+Model Y." Not "The customer has submitted an enquiry regarding..." Use the
+customer's first name once you know it. Warm but brief; he is busy.
+
+You may refer to yourself as I where it is natural ("I'd ask them for a photo of
+the board"). Do not sign the summary — the email does that. And never introduce
+yourself to a customer: the draft reply below is from NICK, in Nick's voice,
+signed by Nick. You are writing to him, not for him.
 
 RULES — these are absolute:
 - NEVER estimate, suggest or imply a price. You do not know his rates.
@@ -222,46 +234,83 @@ Reply as JSON only: {"summary": "...", "priority": "urgent|standard|info", "draf
   }
 }
 
+function nzTime(iso: string): string {
+  // The old WordPress install ran on UTC, so for two years every timestamp anyone
+  // looked at was twelve hours out. Nick reads NZ time.
+  try {
+    return new Date(iso).toLocaleString('en-NZ', {
+      timeZone: 'Pacific/Auckland',
+      weekday: 'short', day: 'numeric', month: 'short',
+      hour: 'numeric', minute: '2-digit', hour12: true,
+    })
+  } catch {
+    return iso
+  }
+}
+
 function buildEmail(
   e: Record<string, unknown>,
   ai: { summary: string; priority: string; draftReply: string | null } | null,
   id: string,
+  createdAt: string,
 ) {
-  const flag = ai?.priority === 'urgent' ? '[URGENT] ' : ''
-  const subject = `${flag}Website enquiry — ${e.jobType ?? 'general'} — ${e.name ?? 'no name'}`
-  const lines = [
-    ai ? `BRIEFING (${ai.priority})` : 'BRIEFING — unavailable, raw enquiry follows',
-    ai ? ai.summary : '(the summarising step failed; nothing is missing below)',
-    '',
-    '---',
-    `Name:    ${e.name ?? '-'}`,
-    `Phone:   ${e.phone ?? '-'}`,
-    `Email:   ${e.email ?? '-'}`,
-    `Suburb:  ${e.suburb ?? '-'}`,
-    `Job:     ${e.jobType ?? '-'}`,
-  ]
-  if (e.jobType === 'ev') {
-    lines.push(
-      `Vehicle: ${e.evVehicle ?? '-'}`,
-      `Charger: ${e.evCharger ?? '-'}`,
-      `Distance board -> parking: ${e.evDistance ?? '-'}`,
-      `Property: ${e.evProperty ?? '-'}`,
-    )
+  const first = String(e.name ?? '').trim().split(/\s+/)[0] || null
+  const urgent = ai?.priority === 'urgent'
+  const who = first ? `${first}${e.suburb ? ` in ${e.suburb}` : ''}` : `someone${e.suburb ? ` in ${e.suburb}` : ''}`
+  const jobLabel: Record<string, string> = {
+    ev: 'EV charger', residential: 'home job', commercial: 'business job', other: 'general enquiry',
   }
-  if (Number(e.photoCount) > 0) lines.push(`Photos:  ${e.photoCount} attached to this email`)
-  lines.push('', 'Message:', String(e.message ?? '-'))
+  const job = jobLabel[String(e.jobType)] ?? 'enquiry'
+
+  const subject = `${urgent ? '[URGENT] ' : ''}New enquiry — ${first ?? 'no name'}${e.suburb ? `, ${e.suburb}` : ''} — ${job}`
+  const rule = '─'.repeat(52)
+  const L: string[] = []
+
+  L.push('Hi Nick,', '')
+  L.push(urgent
+    ? `${who} has been in touch about a ${job}, and it reads as urgent — worth ringing now.`
+    : `You've got a new enquiry from ${who} — ${job}.`)
+
+  if (urgent) L.push('', '⚡  URGENT — ring this one first')
+
+  if (ai?.summary) L.push('', rule, ai.summary)
+
+  L.push('', rule, 'HOW TO REACH THEM', '')
+  if (e.phone) L.push(`  Phone    ${e.phone}${e.okToText ? '     (happy to be texted)' : '     (do not text)'}`)
+  if (e.email) L.push(`  Email    ${e.email}`)
+  if (e.suburb) L.push(`  Suburb   ${e.suburb}`)
+
+  if (e.jobType === 'ev' && (e.evVehicle || e.evCharger || e.evDistance || e.evProperty)) {
+    L.push('', rule, 'THE EV DETAILS THEY GAVE', '')
+    if (e.evVehicle) L.push(`  Car          ${e.evVehicle}`)
+    if (e.evCharger) L.push(`  Charger      ${e.evCharger}`)
+    if (e.evDistance) L.push(`  Board → car  ${e.evDistance}`)
+    if (e.evProperty) L.push(`  Property     ${e.evProperty}`)
+  }
+
+  if (e.message) L.push('', rule, 'IN THEIR OWN WORDS', '', `  "${String(e.message).trim()}"`)
+
+  if (Number(e.photoCount) > 0) {
+    L.push('', rule, `${e.photoCount} PHOTO${Number(e.photoCount) > 1 ? 'S' : ''} ATTACHED TO THIS EMAIL`)
+  }
+
   if (ai?.draftReply) {
-    lines.push(
-      '',
-      '--- SUGGESTED REPLY — copy, change what you like, send it yourself ---',
-      '',
-      ai.draftReply,
-      '',
-      '--- end of suggested reply ---',
-    )
+    L.push('', rule, 'A REPLY YOU COULD SEND', '',
+      "  I've drafted this in your voice. Copy it, change whatever you like,",
+      '  and send it from your own phone. Nothing reaches them unless you send it.', '',
+      rule, '', ai.draftReply, '', rule)
   }
-  lines.push('', `Ref: ${id}`)
-  return { subject, body: lines.join('\n') }
+
+  L.push('', rule, '', '— Alice')
+  L.push('I read the enquiries as they come in and write these up for you.')
+  L.push("I'm software, so there's no need to reply to me — just get back to them.")
+  if (!ai) {
+    L.push('', '(My summarising step fell over on this one, so there is no write-up above.')
+    L.push('Everything they actually sent is still here, though — nothing is missing.)')
+  }
+  L.push('', `Came in ${nzTime(createdAt)} via ${e.sourcePage ?? 'the website'}.  Ref ${id.slice(0, 8).toUpperCase()}`)
+
+  return { subject, body: L.join('\n') }
 }
 
 export const onRequestPost: PagesFunction<Env> = async (ctx) => {
@@ -352,7 +401,7 @@ export const onRequestPost: PagesFunction<Env> = async (ctx) => {
         ).run()
       } catch { /* the enquiry is already safe */ }
 
-      const { subject, body } = buildEmail(e, ai, id)
+      const { subject, body } = buildEmail(e, ai, id, now)
       let outcome: 'sent' | 'failed' | 'skipped' = 'skipped'
 
       // Primary: the rde-notify Worker, which delivers via Cloudflare Email
