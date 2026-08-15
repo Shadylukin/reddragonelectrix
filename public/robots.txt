@@ -3,3 +3,5 @@ User-agent: *
 Allow: /
 
 Sitemap: https://reddragonelectrix.co.nz/sitemap-index.xml
+
+# Plain-text summary for language models: /llms.txt
