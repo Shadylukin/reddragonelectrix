@@ -1,6 +1,7 @@
 ---
 import { ClientRouter } from 'astro:transitions'
 import { site, services, reviews } from '../data/site'
+import '../styles/global.css'
 
 interface Props {
   title: string
@@ -98,43 +99,4 @@ if (site.openingHours) schema.openingHours = site.openingHours
   </body>
 </html>
 
-<style is:global>
-  /* Design tokens land here once the panel returns. Structure only for now. */
-  *,
-  *::before,
-  *::after {
-    box-sizing: border-box;
-  }
-  body {
-    margin: 0;
-  }
-  img,
-  picture,
-  video {
-    max-width: 100%;
-    height: auto;
-    display: block;
-  }
-  .skip-link {
-    position: absolute;
-    left: -9999px;
-    top: 0;
-    padding: 12px 18px;
-    background: #fff;
-    color: #000;
-    z-index: 100;
-  }
-  .skip-link:focus {
-    left: 0;
-  }
-  @media (prefers-reduced-motion: reduce) {
-    *,
-    *::before,
-    *::after {
-      animation-duration: 0.01ms !important;
-      animation-iteration-count: 1 !important;
-      transition-duration: 0.01ms !important;
-      scroll-behavior: auto !important;
-    }
-  }
-</style>
+

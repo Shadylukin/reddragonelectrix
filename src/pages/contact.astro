@@ -1,39 +1,51 @@
 ---
 import Base from '../layouts/Base.astro'
-import { site, services } from '../data/site'
+import Header from '../components/Header.astro'
+import Footer from '../components/Footer.astro'
+import CallBar from '../components/CallBar.astro'
+import PlateLabel from '../components/PlateLabel.astro'
+import { site } from '../data/site'
 const title = `Contact | ${site.name}`
-const description = `Get in touch with Red Dragon Electrix. Call ${site.phone.display} or email for a free quote. Servicing West Auckland and the wider Auckland region.`
+const description = `Call Red Dragon Electrix on ${site.phone.display}, or text a photo of the problem. Registered electricians covering all of Auckland, open ${site.openingHoursDisplay}.`
 ---
 <Base title={title} description={description} path="/contact/">
-  <header class="site-header">
-    <a href="/" class="brand" aria-label={`${site.name} home`}>
-      <img src="/img/logo.png" alt={site.legalName} width="140" height="97" />
-    </a>
-    <nav aria-label="Main">
-      <ul>
-        {services.map((s) => <li><a href={`/${s.slug}/`}>{s.navLabel}</a></li>)}
-        <li><a href="/contact/" aria-current="page">Contact</a></li>
-      </ul>
-    </nav>
-    <a class="call-cta" href={site.phone.href}>Call {site.phone.display}</a>
-  </header>
+  <Header current="contact" />
   <main id="main">
-    <h1>Contact us</h1>
-    <p class="lede">Call Nick directly for a free, no-obligation quote.</p>
-    <ul class="contact-list">
-      <li><a href={site.phone.href}><span>Phone</span><strong>{site.phone.display}</strong></a></li>
-      <li><a href={`mailto:${site.email}?subject=Website%20enquiry`}><span>Email</span><strong>{site.email}</strong></a></li>
-      <li><a href={site.facebook} rel="noopener"><span>Facebook</span><strong>/reddragonelectrix</strong></a></li>
-      <li><span>Based in</span><strong>{site.address.locality}, {site.address.region}</strong></li>
-    </ul>
-    {/* TODO: enquiry form once the mail path is decided. The old form silently died in April 2024
-        and nobody noticed for 28 months — this one gets monitoring before it ships. */}
+    <section class="wrap">
+      <PlateLabel idx="01" name="Get in touch" note="Glen Eden, all Auckland" />
+      <div class="close-grid">
+        <div>
+          <h1 class="h1">Ring Nick<span class="accent">0210 918 6333</span></h1>
+          <a class="close-cta" href={site.phone.href}>
+            <span class="stack">
+              <span class="l">CALL NICK</span>
+              <span class="d">{site.phone.display}</span>
+            </span>
+            <span class="chev" aria-hidden="true">›</span>
+          </a>
+          <div class="close-sub">
+            <a href={`sms:${site.phone.e164}`}><span>Or text a photo of the problem</span></a>
+            <a href={`mailto:${site.email}?subject=Website%20enquiry`}><span>{site.email}</span></a>
+          </div>
+          <p class="honest">
+            On a busy week you might not get him first ring — he's usually up a ladder.
+            Leave a message or text a photo of what's going on and he'll come back to you.
+          </p>
+          {/* TODO: enquiry form goes here once the mail path is settled AND monitored.
+              The old form silently died in April 2024 and nobody noticed for 28 months —
+              this one does not ship without an alert on it. */}
+        </div>
+        <dl class="schedule">
+          <div class="row"><dt>Phone</dt><dd>{site.phone.display}</dd></div>
+          <div class="row"><dt>Email</dt><dd>{site.email}</dd></div>
+          <div class="row"><dt>Hours</dt><dd>{site.openingHoursDisplay}</dd></div>
+          <div class="row"><dt>Based</dt><dd>{site.address.locality}, {site.address.region}</dd></div>
+          <div class="row"><dt>Covering</dt><dd>All Auckland</dd></div>
+          <div class="row"><dt>Facebook</dt><dd><a href={site.facebook} rel="noopener">/reddragonelectrix</a></dd></div>
+        </dl>
+      </div>
+    </section>
   </main>
-  <footer class="site-footer">
-    <p>&copy; {new Date().getFullYear()} {site.legalName}.</p>
-  </footer>
-  <nav class="call-bar" aria-label="Quick contact">
-    <a href={site.phone.href}>Call now</a>
-    <a href={`mailto:${site.email}?subject=Website%20enquiry`}>Email</a>
-  </nav>
+  <Footer />
+  <CallBar />
 </Base>

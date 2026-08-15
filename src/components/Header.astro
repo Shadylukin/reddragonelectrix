@@ -1,0 +1,30 @@
+---
+import { site, services } from '../data/site'
+interface Props { current?: string }
+const { current } = Astro.props
+---
+<header class="site-header">
+  <div class="wrap bar">
+    <a href="/" class="brand" aria-label={`${site.name} home`}>
+      {/* icon.png, not logo.png — the full logo's knockout fills with black on a dark ground */}
+      <img src="/img/icon.png" alt="" width="42" height="42" />
+      <span class="wordmark">
+        <span class="wm-1">RED DRAGON</span>
+        <span class="wm-2">ELECTRIX LTD</span>
+      </span>
+    </a>
+    <nav class="site-nav" aria-label="Main">
+      <ul>
+        {services.map((s) => (
+          <li><a href={`/${s.slug}/`} aria-current={current === s.slug ? 'page' : undefined}>{s.navLabel}</a></li>
+        ))}
+        <li><a href="/contact/" aria-current={current === 'contact' ? 'page' : undefined}>Contact</a></li>
+      </ul>
+    </nav>
+    {/* the number is never behind a menu — there is no hamburger anywhere */}
+    <a class="call-plate" href={site.phone.href}>
+      <span class="lbl">Call Nick</span>
+      <span class="num">{site.phone.display}</span>
+    </a>
+  </div>
+</header>

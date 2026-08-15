@@ -1,95 +1,238 @@
 ---
 import Base from '../layouts/Base.astro'
+import Header from '../components/Header.astro'
+import Footer from '../components/Footer.astro'
+import CallBar from '../components/CallBar.astro'
+import PlateLabel from '../components/PlateLabel.astro'
 import { site, services, reviews } from '../data/site'
 
 const title = 'EV Charger Installation Auckland | Red Dragon Electrix'
 const description =
-  'Manufacturer-trained EV charger installation across Auckland, including Tesla wall connectors. Also switchboards, rewires, lighting and power points. Call 0210 918 6333 for a free quote.'
+  'Manufacturer-trained EV charger installation across Auckland, including Tesla wall connectors. Also switchboards, rewires, lighting and power points. Call 0210 918 6333.'
+
+const lead = reviews[0]
+const rest = reviews.slice(1, 4)
+
+// Symptom-triggered prompts. A generic "get in touch" converts worse than naming
+// the thing that made the person open the page in the first place.
+const prompts: Record<string, string> = {
+  'ev-chargers': 'Got the car on order? Ring me before the charger arrives.',
+  residential: 'Something tripping, buzzing or burnt-smelling? Ring me, don’t wait.',
+  commercial: 'Need it fixed before you open tomorrow? Ring me.',
+}
 ---
 
 <Base title={title} description={description} path="/">
-  <header class="site-header">
-    <a href="/" class="brand" aria-label={`${site.name} home`}>
-      <img src="/img/logo.png" alt={site.legalName} width="140" height="97" />
-    </a>
-    <nav aria-label="Main">
-      <ul>
-        {services.map((s) => <li><a href={`/${s.slug}/`}>{s.navLabel}</a></li>)}
-        <li><a href="/contact/">Contact</a></li>
-      </ul>
-    </nav>
-    <a class="call-cta" href={site.phone.href}>Call {site.phone.display}</a>
-  </header>
-
+  <Header />
   <main id="main">
-    <section class="hero">
-      <img src="/img/tesla-charger.jpg" alt="" class="hero-bg" aria-hidden="true" />
-      <div class="hero-content">
-        <p class="eyebrow">Registered electricians · Auckland-wide</p>
-        <h1>{site.tagline}</h1>
-        <p class="tagline-secondary">{site.taglineSecondary}</p>
-        <p class="lede">
-          Tesla wall connectors, Gen 3 units and home charging — plus switchboards, rewires,
-          lighting and power points for homes and businesses right across Auckland.
-        </p>
-        <a class="btn-call" href={site.phone.href}>{site.phone.display}</a>
-        <p class="rating">
-          <span aria-hidden="true">★★★★★</span>
-          <strong>{site.rating.value}.0 out of 5</strong> from {site.rating.count} reviews
-        </p>
+    <!-- 01 HERO -->
+    <section class="wrap" style="padding-top:0">
+      <div class="hero-grid">
+        <div>
+          <figure class="hero-figure">
+            <span class="hero-tab">01&nbsp;&nbsp;AUCKLAND</span>
+            <img
+              src="/img/hero-switchboard.jpg"
+              alt="Nick from Red Dragon Electrix working on an open switchboard, wearing a branded jacket"
+              width="1497" height="2000" fetchpriority="high"
+            />
+          </figure>
+          <div class="hero-caption">
+            <span class="who">That’s Nick. This is his work.</span>
+            <span class="what">Switchboard upgrade, in progress</span>
+          </div>
+        </div>
+
+        <div class="hero-body">
+          <h1 class="h1">
+            Need an EV charger fitted in Auckland?
+            <span class="accent">Ring Nick.</span>
+          </h1>
+          <p class="hero-sub">
+            Red Dragon Electrix is a registered electrical business run out of Glen Eden.
+            Tesla wall connectors, home chargers, switchboards and rewires — right across Auckland.
+          </p>
+
+          <p class="credentials">
+            <b>EWRB</b> registered<span class="sep">·</span>
+            <b>CoC</b> on every job<span class="sep">·</span>
+            <b>AS/NZS 3000:2018</b><span class="sep">·</span>
+            <b>{site.rating.value}.0</b> from {site.rating.count} reviews
+          </p>
+
+          <div class="doors">
+            {services.map((s, i) => (
+              <a class="door" href={`/${s.slug}/`}>
+                <span class="idx">{String(i + 1).padStart(2, '0')}</span>
+                <span class="nm">{s.navLabel}</span>
+              </a>
+            ))}
+          </div>
+        </div>
       </div>
     </section>
 
-    <section class="services" aria-labelledby="services-h">
-      <h2 id="services-h">What we do</h2>
-      <ul class="service-grid">
-        {services.map((s) => (
-          <li>
-            <a href={`/${s.slug}/`}>
-              <img src={s.image} alt="" width="800" height="600" loading="lazy" />
+    <div class="hazard"></div>
+
+    <!-- 02 REVIEWS — deliberately at position two, on flat black between two photographic sections -->
+    <section class="wrap">
+      <PlateLabel idx="02" name="What the neighbours said" note="Google reviews, unedited" />
+      <h2 class="h2">Nine people have left a review.<br />All nine gave five stars.</h2>
+      <p class="lede">
+        Which is a small enough number that you should read them rather than trust the average.
+        So here they are, word for word.
+      </p>
+      <blockquote class="quote-lead" style="margin-top:26px">
+        <p>{lead.body}</p>
+        <p class="attr"><span class="nm">{lead.author}</span> <span class="src">· Google review</span></p>
+      </blockquote>
+      <div class="quote-grid">
+        {rest.map((r) => (
+          <blockquote>
+            <p>{r.body}</p>
+            <p class="attr"><span class="nm">{r.author}</span> <span class="src">· Google review</span></p>
+          </blockquote>
+        ))}
+      </div>
+    </section>
+
+    <!-- 03 SERVICES -->
+    <section class="wrap">
+      <PlateLabel idx="03" name="What we do" note="Three trades, one sparky, one number" />
+      <div class="plates">
+        {services.map((s, i) => (
+          <article class="plate-card">
+            <div class="shot">
+              <img src={s.image} alt={s.imageAlt ?? ''} width="800" height="800" loading="lazy" />
+              <span class="tag">
+                <span class="i">{String(i + 1).padStart(2, '0')}</span>
+                <span class="n">{s.navLabel}</span>
+              </span>
+            </div>
+            <div class="inner">
               <h3>{s.title}</h3>
-              <p>{s.blurb}</p>
-            </a>
-          </li>
+              <p class="desc">{s.description}</p>
+              <ul class="spec">
+                {s.items.slice(0, 6).map((item) => <li>{item}</li>)}
+              </ul>
+              <a class="plate-call" href={site.phone.href}>
+                <span class="prompt">{prompts[s.slug]}</span>
+                <span class="row">
+                  <span class="l">CALL NICK</span>
+                  <span class="d">{site.phone.display}</span>
+                </span>
+              </a>
+              <a class="plate-sms" href={`sms:${site.phone.e164}`}>
+                <span>Or text a photo of the problem</span>
+              </a>
+            </div>
+          </article>
         ))}
-      </ul>
+      </div>
     </section>
 
-    <section class="proof" aria-labelledby="proof-h">
-      <h2 id="proof-h">What our customers say</h2>
-      <ul class="review-grid">
-        {reviews.slice(0, 3).map((r) => (
-          <li>
-            <blockquote>
-              <span class="stars" aria-label={`${r.rating} out of 5 stars`}>★★★★★</span>
-              <p>{r.body}</p>
-              <cite>{r.author}</cite>
-            </blockquote>
-          </li>
-        ))}
-      </ul>
+    <!-- 05 JOB RECORD — the strongest trust asset in the set -->
+    <section class="wrap">
+      <PlateLabel idx="04" name="Job record" note="VIR rewire, Glen Eden" />
+      <div class="record">
+        <div class="head">
+          <span class="l">Job record — VIR rewire</span>
+          <span class="r">Glen Eden</span>
+        </div>
+        <div class="halves" style="--shot:url('/img/before-after.jpg')">
+          <figure>
+            <div class="win before"></div>
+            <figcaption>
+              <span class="chip b">BEFORE</span>
+              <p>Perished VIR rubber insulation, original mid-century wiring.</p>
+            </figcaption>
+          </figure>
+          <figure>
+            <div class="win after"></div>
+            <figcaption>
+              <span class="chip a">AFTER</span>
+              <p>New TPS, labelled circuits, RCD-protected board.</p>
+            </figcaption>
+          </figure>
+          <div class="why">
+            <h3>Why this matters</h3>
+            <p>
+              VIR is rubber-insulated wiring used in New Zealand houses well into the 1960s.
+              The rubber goes hard and cracks with age, and once it does, the copper underneath
+              can end up bare inside your walls. If your house is that era and has never been
+              rewired, it is worth having someone look at it.
+            </p>
+          </div>
+        </div>
+      </div>
     </section>
 
-    <section class="work" aria-labelledby="work-h">
-      <h2 id="work-h">Recent work</h2>
-      <p>Before and after — a full VIR rewire and switchboard replacement.</p>
-      <img src="/img/before-after.jpg" alt="A rewired switchboard shown before and after the work" width="1800" height="1350" loading="lazy" />
+    <!-- 07 COMPLIANCE -->
+    <section class="compliance">
+      <img class="bg" src="/img/banner.jpg" alt="" aria-hidden="true" loading="lazy" />
+      <div class="wrap inner">
+        <h2 class="h2">Check us before you let anyone near your switchboard</h2>
+        <p class="lede">
+          Look it up on ewrb.govt.nz before anyone comes near your switchboard — for us,
+          or for the next quote you get.
+        </p>
+        <div class="certs">
+          <div class="cert">
+            <span class="n">EWRB registered</span>
+            {/* Nick's actual registration number drops in here. An invitation to check
+                that resolves to nothing is worse than no invitation, so until he sends
+                it, this tile states the fact without pretending to a number. */}
+            <p>{site.ewrbRegistration
+              ? `Registration #${site.ewrbRegistration} — verifiable on ewrb.govt.nz.`
+              : 'Registered with the Electrical Workers Registration Board.'}</p>
+          </div>
+          <div class="cert">
+            <span class="n">Certificate of Compliance</span>
+            <p>Issued on every job, as the regulations require.</p>
+          </div>
+          <div class="cert">
+            <span class="n">AS/NZS 3000:2018</span>
+            <p>All work to the current New Zealand wiring standard.</p>
+          </div>
+          <div class="cert">
+            <span class="n">Manufacturer-trained</span>
+            <p>EV charger installation, including Tesla wall connectors.</p>
+          </div>
+        </div>
+      </div>
     </section>
 
-    <section class="contact-close" aria-labelledby="contact-h">
-      <h2 id="contact-h">Get in touch</h2>
-      <p>Servicing all of Auckland. Open {site.openingHoursDisplay}.</p>
-      <a class="btn-call" href={site.phone.href}>{site.phone.display}</a>
-      <a class="btn-secondary" href={`mailto:${site.email}?subject=Website%20enquiry`}>Email us</a>
+    <!-- 08 CONTACT CLOSE -->
+    <section class="wrap">
+      <PlateLabel idx="05" name="Get in touch" note="Glen Eden, all Auckland" />
+      <div class="close-grid">
+        <div>
+          <h2 class="h2">Ring Nick</h2>
+          <a class="close-cta" href={site.phone.href}>
+            <span class="stack">
+              <span class="l">CALL NICK</span>
+              <span class="d">{site.phone.display}</span>
+            </span>
+            <span class="chev" aria-hidden="true">›</span>
+          </a>
+          <div class="close-sub">
+            <a href={`sms:${site.phone.e164}`}><span>Or text a photo of the problem</span></a>
+            <a href={`mailto:${site.email}?subject=Website%20enquiry`}><span>{site.email}</span></a>
+          </div>
+          <p class="honest">
+            On a busy week you might not get him first ring — he’s usually up a ladder.
+            Leave a message or text a photo and he’ll come back to you.
+          </p>
+        </div>
+        <dl class="schedule">
+          <div class="row"><dt>Hours</dt><dd>{site.openingHoursDisplay}</dd></div>
+          <div class="row"><dt>Based</dt><dd>{site.address.locality}, {site.address.region}</dd></div>
+          <div class="row"><dt>Covering</dt><dd>All Auckland</dd></div>
+          <div class="row"><dt>Reviews</dt><dd>{site.rating.value}.0 from {site.rating.count}</dd></div>
+        </dl>
+      </div>
     </section>
   </main>
-
-  <footer class="site-footer">
-    <p>&copy; {new Date().getFullYear()} {site.legalName}. Registered electricians, Auckland, New Zealand.</p>
-  </footer>
-
-  <nav class="call-bar" aria-label="Quick contact">
-    <a href={site.phone.href}>Call now</a>
-    <a href={`mailto:${site.email}?subject=Website%20enquiry`}>Email</a>
-  </nav>
+  <Footer />
+  <CallBar />
 </Base>

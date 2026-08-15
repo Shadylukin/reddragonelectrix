@@ -1,90 +1,157 @@
 ---
 import Base from '../layouts/Base.astro'
+import Header from '../components/Header.astro'
+import Footer from '../components/Footer.astro'
+import CallBar from '../components/CallBar.astro'
+import PlateLabel from '../components/PlateLabel.astro'
 import { site, services, reviews } from '../data/site'
 
 export function getStaticPaths() {
-  return services.map((service) => ({
-    params: { slug: service.slug },
-    props: { service },
-  }))
+  return services.map((service) => ({ params: { slug: service.slug }, props: { service } }))
 }
 
 const { service } = Astro.props
 
-// Every page gets a hand-written description. The old site auto-generated these and ended up
-// showing scraped navigation text in Google results for three of its four pages.
+// Every page gets a hand-written description. The old site auto-generated these and
+// ended up showing scraped navigation text in Google results on three of four pages.
 const title = `${service.title} Auckland | ${site.name}`
-const description = `${service.description} Call ${site.phone.display} for a free quote.`
+const description = `${service.description} Call ${site.phone.display}.`
+
+const prompts: Record<string, string> = {
+  'ev-chargers': 'Got the car on order? Ring me before the charger arrives.',
+  residential: 'Something tripping, buzzing or burnt-smelling? Ring me, don’t wait.',
+  commercial: 'Need it fixed before you open tomorrow? Ring me.',
+}
+const others = services.filter((s) => s.slug !== service.slug)
+const lead = reviews[0]
 ---
 
 <Base title={title} description={description} path={`/${service.slug}/`} ogImage={service.image}>
-  <header class="site-header">
-    <a href="/" class="brand" aria-label={`${site.name} home`}>
-      <img src="/img/logo.png" alt={site.legalName} width="140" height="97" />
-    </a>
-    <nav aria-label="Main">
-      <ul>
-        {services.map((s) => (
-          <li>
-            <a href={`/${s.slug}/`} aria-current={s.slug === service.slug ? 'page' : undefined}>
-              {s.navLabel}
-            </a>
-          </li>
-        ))}
-        <li><a href="/contact/">Contact</a></li>
-      </ul>
-    </nav>
-    <a class="call-cta" href={site.phone.href}>Call {site.phone.display}</a>
-  </header>
-
+  <Header current={service.slug} />
   <main id="main">
-    <section class="hero hero--service">
-      <img src={service.image} alt="" class="hero-bg" aria-hidden="true" />
-      <div class="hero-content">
-        <p class="eyebrow">Auckland-wide</p>
-        {/* Exactly one h1 per page. The old site had three on some pages. */}
-        <h1>{service.title}</h1>
-        <p class="lede">{service.description}</p>
-        <a class="btn-call" href={site.phone.href}>{site.phone.display}</a>
+    <section class="wrap" style="padding-top:0">
+      <div class="hero-grid">
+        <div>
+          <figure class="hero-figure">
+            <span class="hero-tab">01&nbsp;&nbsp;AUCKLAND</span>
+            <img src={service.image} alt={service.imageAlt ?? ''} width="1200" height="1500" fetchpriority="high" />
+          </figure>
+          <div class="hero-caption">
+            <span class="who">Red Dragon Electrix</span>
+            <span class="what">{service.navLabel}</span>
+          </div>
+        </div>
+        <div class="hero-body">
+          {/* Exactly one h1 per page. The old site had three on some pages. */}
+          <h1 class="h1">{service.title}<span class="accent">Ring Nick.</span></h1>
+          <p class="hero-sub">{service.description}</p>
+          <p class="credentials">
+            <b>EWRB</b> registered<span class="sep">·</span>
+            <b>CoC</b> on every job<span class="sep">·</span>
+            <b>AS/NZS 3000:2018</b><span class="sep">·</span>
+            <b>{site.rating.value}.0</b> from {site.rating.count} reviews
+          </p>
+          <a class="close-cta" href={site.phone.href} style="margin-top:22px">
+            <span class="stack">
+              <span class="l">CALL NICK</span>
+              <span class="d">{site.phone.display}</span>
+            </span>
+            <span class="chev" aria-hidden="true">›</span>
+          </a>
+        </div>
       </div>
     </section>
 
-    <section class="service-detail" aria-labelledby="detail-h">
-      <h2 id="detail-h">What we cover</h2>
-      <ul class="tick-list">
-        {service.items.map((item) => <li>{item}</li>)}
-      </ul>
+    <div class="hazard"></div>
+
+    <section class="wrap">
+      <PlateLabel idx="02" name="What we cover" note={service.navLabel} />
+      <div class="plates">
+        <article class="plate-card" style="grid-column:1/-1">
+          <div class="inner">
+            <ul class="spec">
+              {service.items.map((item) => <li>{item}</li>)}
+            </ul>
+            <a class="plate-call" href={site.phone.href} style="margin-top:20px">
+              <span class="prompt">{prompts[service.slug]}</span>
+              <span class="row">
+                <span class="l">CALL NICK</span>
+                <span class="d">{site.phone.display}</span>
+              </span>
+            </a>
+            <a class="plate-sms" href={`sms:${site.phone.e164}`}>
+              <span>Or text a photo of the problem</span>
+            </a>
+          </div>
+        </article>
+      </div>
     </section>
 
-    <section class="proof" aria-labelledby="proof-h">
-      <h2 id="proof-h">Rated {site.rating.value}.0 from {site.rating.count} reviews</h2>
-      <ul class="review-grid">
-        {reviews.slice(0, 2).map((r) => (
-          <li>
-            <blockquote>
-              <span class="stars" aria-label={`${r.rating} out of 5 stars`}>★★★★★</span>
-              <p>{r.body}</p>
-              <cite>{r.author}</cite>
-            </blockquote>
-          </li>
+    <section class="wrap">
+      <PlateLabel idx="03" name="What the neighbours said" note="Google reviews, unedited" />
+      <blockquote class="quote-lead">
+        <p>{lead.body}</p>
+        <p class="attr"><span class="nm">{lead.author}</span> <span class="src">· Google review</span></p>
+      </blockquote>
+    </section>
+
+    <section class="wrap">
+      <PlateLabel idx="04" name="Also on the tools for" />
+      <div class="plates">
+        {others.map((s, i) => (
+          <article class="plate-card">
+            <div class="shot">
+              <img src={s.image} alt={s.imageAlt ?? ''} width="800" height="800" loading="lazy" />
+              <span class="tag">
+                <span class="i">{String(i + 1).padStart(2, '0')}</span>
+                <span class="n">{s.navLabel}</span>
+              </span>
+            </div>
+            <div class="inner">
+              <h3>{s.title}</h3>
+              <p class="desc">{s.blurb}</p>
+              <a class="plate-call" href={`/${s.slug}/`} style="margin-top:16px">
+                <span class="row">
+                  <span class="l">SEE</span>
+                  <span class="d">{s.navLabel}</span>
+                </span>
+              </a>
+            </div>
+          </article>
         ))}
-      </ul>
+      </div>
     </section>
 
-    <section class="contact-close" aria-labelledby="contact-h">
-      <h2 id="contact-h">Get a free quote</h2>
-      <p>Call Nick directly, or send an email and he'll get back to you.</p>
-      <a class="btn-call" href={site.phone.href}>{site.phone.display}</a>
-      <a class="btn-secondary" href={`mailto:${site.email}?subject=${encodeURIComponent(service.title + ' enquiry')}`}>Email us</a>
+    <section class="wrap">
+      <PlateLabel idx="05" name="Get in touch" note="Glen Eden, all Auckland" />
+      <div class="close-grid">
+        <div>
+          <h2 class="h2">Ring Nick</h2>
+          <a class="close-cta" href={site.phone.href}>
+            <span class="stack">
+              <span class="l">CALL NICK</span>
+              <span class="d">{site.phone.display}</span>
+            </span>
+            <span class="chev" aria-hidden="true">›</span>
+          </a>
+          <div class="close-sub">
+            <a href={`sms:${site.phone.e164}`}><span>Or text a photo of the problem</span></a>
+            <a href={`mailto:${site.email}?subject=${encodeURIComponent(service.title + ' enquiry')}`}><span>{site.email}</span></a>
+          </div>
+          <p class="honest">
+            On a busy week you might not get him first ring — he’s usually up a ladder.
+            Leave a message or text a photo and he’ll come back to you.
+          </p>
+        </div>
+        <dl class="schedule">
+          <div class="row"><dt>Hours</dt><dd>{site.openingHoursDisplay}</dd></div>
+          <div class="row"><dt>Based</dt><dd>{site.address.locality}, {site.address.region}</dd></div>
+          <div class="row"><dt>Covering</dt><dd>All Auckland</dd></div>
+          <div class="row"><dt>Reviews</dt><dd>{site.rating.value}.0 from {site.rating.count}</dd></div>
+        </dl>
+      </div>
     </section>
   </main>
-
-  <footer class="site-footer">
-    <p>&copy; {new Date().getFullYear()} {site.legalName}. Registered electricians, Auckland, New Zealand.</p>
-  </footer>
-
-  <nav class="call-bar" aria-label="Quick contact">
-    <a href={site.phone.href}>Call now</a>
-    <a href={`mailto:${site.email}?subject=Website%20enquiry`}>Email</a>
-  </nav>
+  <Footer />
+  <CallBar />
 </Base>

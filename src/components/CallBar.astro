@@ -1,0 +1,12 @@
+---
+import { site } from '../data/site'
+---
+<nav class="call-bar" aria-label="Quick contact">
+  <a href={site.phone.href}>
+    <span class="l">CALL NICK</span>
+    <span class="d">{site.phone.display}</span>
+  </a>
+  <a href={`sms:${site.phone.e164}`}>
+    <span class="l">TEXT A PHOTO</span>
+  </a>
+</nav>

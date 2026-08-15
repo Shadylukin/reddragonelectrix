@@ -1,0 +1,17 @@
+---
+import { site } from '../data/site'
+---
+<footer class="site-footer">
+  <div class="wrap">
+    <p>
+      {site.legalName} — registered electricians, {site.address.locality}, {site.address.region}.
+      {site.ewrbRegistration && <> EWRB #{site.ewrbRegistration}.</>}
+    </p>
+    <p>
+      <a href={site.phone.href}>{site.phone.display}</a> ·
+      <a href={`mailto:${site.email}`}>{site.email}</a> ·
+      <a href={site.facebook} rel="noopener">Facebook</a>
+    </p>
+    <p>&copy; {new Date().getFullYear()} {site.legalName}. Open {site.openingHoursDisplay}.</p>
+  </div>
+</footer>
