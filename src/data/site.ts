@@ -39,10 +39,19 @@ export const site = {
     e164: '+642109186333',
   },
 
-  // NOTE: nick@reddragonelectrix.co.nz had no mailbox as of Aug 2026 — the domain had no MX
-  // records at all. Using the Gmail that the old contact form delivered to until that is resolved.
-  email: 'dragonelectrix@gmail.com',
-  emailBranded: 'nick@reddragonelectrix.co.nz', // TODO: confirm a mailbox exists before using
+  // The public address. Cloudflare Email Routing forwards nick@ (and a catch-all for
+  // anything else at the domain) to the Gmail below. Verified: MX live, rule enabled,
+  // destination confirmed 2026-08-15.
+  //
+  // Until today the domain had no MX records at all, so this address had been bouncing
+  // silently since the old host pulled the site — which is why the old contact form
+  // delivered to a Gmail instead.
+  email: 'nick@reddragonelectrix.co.nz',
+
+  // Where mail actually lands. Internal only — never shown on the site. Notification
+  // delivery is hardcoded to this in functions/api/enquiry.ts and the notify Worker,
+  // because it is the verified Email Routing destination.
+  emailDelivery: 'dragonelectrix@gmail.com',
 
   facebook: 'https://www.facebook.com/reddragonelectrix',
 
