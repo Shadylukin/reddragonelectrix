@@ -21,6 +21,10 @@
 interface Env {
   DB: D1Database
   GEMINI_API_KEY?: string
+  /** The rde-notify Worker. Pages cannot hold a [[send_email]] binding; Workers can. */
+  NOTIFY_URL?: string
+  NOTIFY_SECRET?: string
+  /** Optional fallback if we ever move off Cloudflare Email Routing. */
   RESEND_API_KEY?: string
 }
 
@@ -218,7 +222,27 @@ export const onRequestPost: PagesFunction<Env> = async (ctx) => {
 
       const { subject, body } = buildEmail(e, ai, id)
       let outcome: 'sent' | 'failed' | 'skipped' = 'skipped'
-      if (env.RESEND_API_KEY) {
+
+      // Primary: the rde-notify Worker, which delivers via Cloudflare Email
+      // Routing. No third-party mail vendor involved.
+      if (env.NOTIFY_URL && env.NOTIFY_SECRET) {
+        try {
+          const r = await fetch(env.NOTIFY_URL, {
+            method: 'POST',
+            headers: {
+              'content-type': 'application/json',
+              'x-notify-secret': env.NOTIFY_SECRET,
+            },
+            body: JSON.stringify({ subject, text: body, replyTo: (e.email as string) || undefined }),
+          })
+          outcome = r.ok ? 'sent' : 'failed'
+        } catch {
+          outcome = 'failed'
+        }
+      }
+
+      // Fallback: Resend, if it is ever configured and the relay did not deliver.
+      if (outcome !== 'sent' && env.RESEND_API_KEY) {
         try {
           const r = await fetch('https://api.resend.com/emails', {
             method: 'POST',

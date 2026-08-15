@@ -1,0 +1,17 @@
+# A single-purpose Worker that exists for one reason: Cloudflare Pages Functions
+# cannot hold a [[send_email]] binding, but Workers can. The Pages Function calls
+# this to deliver enquiry notifications through Cloudflare Email Routing.
+#
+# No third-party email vendor, no signup, no extra API key.
+
+name = "rde-notify"
+main = "src/index.ts"
+compatibility_date = "2026-08-01"
+
+# Sends via Email Routing to a verified destination on the zone.
+[[send_email]]
+name = "NOTIFY"
+destination_address = "dragonelectrix@gmail.com"
+
+# NOTIFY_SECRET is a shared secret, set separately, so this is not an open relay:
+#   wrangler secret put NOTIFY_SECRET
