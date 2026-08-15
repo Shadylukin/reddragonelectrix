@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://reddragonelectrix.co.nz/sitemap.xml

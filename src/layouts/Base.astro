@@ -1,0 +1,140 @@
+---
+import { ClientRouter } from 'astro:transitions'
+import { site, services, reviews } from '../data/site'
+
+interface Props {
+  title: string
+  description: string
+  /** Path only, e.g. "/ev-chargers/". Used for the canonical URL. */
+  path?: string
+  /** Public path to the social share image. */
+  ogImage?: string
+}
+
+const { title, description, path = '/', ogImage = '/img/hero-switchboard.jpg' } = Astro.props
+const canonical = new URL(path, site.url).href
+const ogUrl = new URL(ogImage, site.url).href
+
+// schema.org/Electrician is a LocalBusiness subtype — the correct type for a trade business.
+// The old site used a bare "Organization", which told Google nothing about locality.
+const schema: Record<string, unknown> = {
+  '@context': 'https://schema.org',
+  '@type': 'Electrician',
+  '@id': `${site.url}/#business`,
+  name: site.legalName,
+  url: site.url,
+  image: new URL('/img/hero-switchboard.jpg', site.url).href,
+  logo: new URL('/img/logo.png', site.url).href,
+  telephone: site.phone.e164,
+  email: site.email,
+  priceRange: '$$',
+  address: {
+    '@type': 'PostalAddress',
+    ...(site.address.street ? { streetAddress: site.address.street } : {}),
+    addressLocality: site.address.locality,
+    addressRegion: site.address.region,
+    addressCountry: site.address.country,
+  },
+  areaServed: site.areaServed.map((name) => ({ '@type': 'Place', name })),
+  sameAs: [site.facebook],
+  aggregateRating: {
+    '@type': 'AggregateRating',
+    ratingValue: String(site.rating.value),
+    bestRating: String(site.rating.best),
+    reviewCount: String(site.rating.count),
+  },
+  review: reviews.slice(0, 3).map((r) => ({
+    '@type': 'Review',
+    author: { '@type': 'Person', name: r.author },
+    reviewRating: { '@type': 'Rating', ratingValue: String(r.rating), bestRating: '5' },
+    reviewBody: r.body,
+  })),
+  hasOfferCatalog: {
+    '@type': 'OfferCatalog',
+    name: 'Electrical services',
+    itemListElement: services.map((s) => ({
+      '@type': 'Offer',
+      itemOffered: { '@type': 'Service', name: s.title, description: s.description },
+    })),
+  },
+}
+
+// Only emit opening hours once Nick has confirmed them — inventing them is worse than omitting.
+if (site.openingHours) schema.openingHours = site.openingHours
+---
+
+<!doctype html>
+<html lang="en-NZ">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonical} />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:image" content={ogUrl} />
+    <meta property="og:locale" content="en_NZ" />
+    <meta name="twitter:card" content="summary_large_image" />
+
+    <link rel="icon" href="/img/icon.png" type="image/png" />
+    <meta name="theme-color" content="#0D0B0B" />
+    <link rel="sitemap" href="/sitemap-index.xml" />
+
+    <ClientRouter />
+
+    <script type="application/ld+json" set:html={JSON.stringify(schema)} />
+
+    <slot name="head" />
+  </head>
+
+  <body>
+    <a class="skip-link" href="#main">Skip to content</a>
+    <slot />
+  </body>
+</html>
+
+<style is:global>
+  /* Design tokens land here once the panel returns. Structure only for now. */
+  *,
+  *::before,
+  *::after {
+    box-sizing: border-box;
+  }
+  body {
+    margin: 0;
+  }
+  img,
+  picture,
+  video {
+    max-width: 100%;
+    height: auto;
+    display: block;
+  }
+  .skip-link {
+    position: absolute;
+    left: -9999px;
+    top: 0;
+    padding: 12px 18px;
+    background: #fff;
+    color: #000;
+    z-index: 100;
+  }
+  .skip-link:focus {
+    left: 0;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+</style>

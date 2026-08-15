@@ -1,0 +1,171 @@
+/**
+ * Single source of truth for business facts.
+ *
+ * Everything here was verified against the old site's database during the August 2026
+ * rebuild. Anything NOT verified is marked TODO and must be confirmed with Nick before
+ * it goes live — do not invent values for these.
+ */
+
+export const site = {
+  name: 'Red Dragon Electrix',
+  legalName: 'Red Dragon Electrix Limited',
+
+  // POSITIONING CHANGE, Aug 2026. The old site led with "West Auckland's Most Reputable
+  // Electricians". Enquiry data from 2023-24 says that was wrong on both counts:
+  //   - 77 of 96 enquiries (80%) were EV / Tesla charger installations
+  //   - roughly half the named locations were outside West Auckland (Hobsonville was the
+  //     single biggest suburb, then Epsom, Remuera, Parnell, Northcote, Papakura)
+  // So: lead with EV, serve all of Auckland. General electrical still sits underneath.
+  tagline: "Auckland's EV Charger Specialists",
+  taglineSecondary: 'And everything else electrical.',
+  description:
+    'Manufacturer-trained EV charger installation across Auckland, including Tesla wall connectors. Plus switchboards, rewires, lighting and power points for homes and businesses.',
+  url: 'https://reddragonelectrix.co.nz',
+  locale: 'en-NZ',
+
+  phone: {
+    display: '0210 918 6333',
+    href: 'tel:+642109186333',
+    e164: '+642109186333',
+  },
+
+  // NOTE: nick@reddragonelectrix.co.nz had no mailbox as of Aug 2026 — the domain had no MX
+  // records at all. Using the Gmail that the old contact form delivered to until that is resolved.
+  email: 'dragonelectrix@gmail.com',
+  emailBranded: 'nick@reddragonelectrix.co.nz', // TODO: confirm a mailbox exists before using
+
+  facebook: 'https://www.facebook.com/reddragonelectrix',
+
+  address: {
+    locality: 'Glen Eden',
+    region: 'Auckland',
+    country: 'NZ',
+    // Old site said "Matama Road, Glen Eden" with no street number.
+    street: null as string | null, // TODO: confirm with Nick, or omit entirely
+  },
+
+  // The old site never named a single suburb anywhere — verified across the whole database.
+  // This list is derived from where enquiries ACTUALLY came from (96 enquiries, 2023-2024),
+  // not from guesswork. Note how far beyond West Auckland it reaches.
+  areaServed: ['Auckland', 'West Auckland', 'North Shore', 'Central Auckland'],
+  suburbs: [
+    // West
+    'Glen Eden', 'Titirangi', 'Henderson', 'Te Atatū', 'Swanson', 'Ranui', 'Avondale',
+    'Blockhouse Bay', 'New Lynn', 'Massey',
+    // Northwest / North
+    'Hobsonville', 'Westgate', 'Northcote',
+    // Central / East
+    'Mt Albert', 'Grey Lynn', 'Epsom', 'Remuera', 'Parnell',
+  ] as string[],
+
+  // Confirmed: 7am-7pm, seven days.
+  openingHours: 'Mo-Su 07:00-19:00' as string | null,
+  openingHoursDisplay: '7am – 7pm, 7 days',
+
+  // TODO: still unknown. Both are strong trust signals — worth getting from Nick.
+  ewrbRegistration: null as string | null,
+  insured: null as boolean | null,
+
+  rating: {
+    value: 5,
+    best: 5,
+    count: 9, // verified: wphx_glsr_ratings, 9 rows, all rated 5
+  },
+} as const
+
+/**
+ * Order matters — this drives nav order and homepage hierarchy.
+ * EV chargers lead because 80% of measured demand was EV, not because it reads well.
+ */
+export const services = [
+  {
+    slug: 'ev-chargers',
+    title: 'EV Charger Installation',
+    navLabel: 'EV Chargers',
+    flagship: true,
+    blurb: 'Manufacturer-trained EV charger specialists, all across Auckland.',
+    description:
+      'Manufacturer-trained EV charger installation for homes and businesses across Auckland, including Tesla wall connectors and Gen 3 units.',
+    image: '/img/ev-charger.jpg',
+    imageAlt: 'An EV charger installed on a garage wall',
+    items: [
+      'Tesla Wall Connector & Gen 3 installation',
+      'Home EV charger installation',
+      'Commercial & workplace charging',
+      'Switchboard capacity assessment',
+      'Dedicated circuit installation',
+      'Apartment, terrace & body corporate installs',
+      'Load management & future-proofing',
+    ],
+  },
+  {
+    slug: 'residential',
+    title: 'Residential Electricians',
+    navLabel: 'Residential',
+    blurb: 'Reliable, on-time electricians for homes.',
+    description:
+      'Maintenance, rewires, lighting and switchboard upgrades for Auckland homes, done tidily and on time.',
+    image: '/img/residential.jpg',
+    items: [
+      'Switchboard installation & upgrades',
+      'VIR identification & rewiring',
+      'LED lighting upgrades',
+      'Power outlets & USB power outlets',
+      'Bathroom lighting & ventilation',
+      'Oven & kitchen appliance installation',
+      'Heated towel rail installation',
+      'Residential maintenance',
+    ],
+  },
+  {
+    slug: 'commercial',
+    title: 'Commercial Electricians',
+    navLabel: 'Commercial',
+    blurb: 'Reliable, quality and expert commercial electricians.',
+    description:
+      'Fit-outs, lighting and new build electrical for Auckland businesses, from single sites to full commercial projects.',
+    image: '/img/commercial.jpg',
+    items: [
+      'Commercial fit-outs',
+      'Business lighting installation',
+      'New build electrical',
+      'Ethernet & data connections',
+      'Switchboard installation & upgrades',
+      'Maintenance & fault finding',
+    ],
+  },
+] as const
+
+/** Real reviews, verified 5-star in the old site's database. Do not edit the wording. */
+export const reviews = [
+  {
+    author: 'Prashant Champa',
+    rating: 5,
+    body: 'Great job installing our Tesla wall connector. Nick was great, very professional. Highly recommended!',
+  },
+  {
+    author: 'Gail Blackwell',
+    rating: 5,
+    body: 'Great communicator, turned up on time and did a great job and left premises clean and tidy. Installed outside power points, heater and replaced two bathroom lights.',
+  },
+  {
+    author: 'Ben Berry',
+    rating: 5,
+    body: 'Did a great job upgrading our switchboard, swapping out all of our lights and replacing a lot of the power points.',
+  },
+  {
+    author: 'Michelle Swanepoel',
+    rating: 5,
+    body: 'Very happy with the service done by Nick! Easy to deal with and done to a great standard. Highly recommend.',
+  },
+  {
+    author: 'Nimfa Rey Uy',
+    rating: 5,
+    body: 'Responsive, creative & reliable when he did our EV charging station. Highly recommended.',
+  },
+  {
+    author: 'Lynn McNeill',
+    rating: 5,
+    body: 'Amazing job — on time, met my brief and did a great job for a great price. Outside garden lighting.',
+  },
+] as const

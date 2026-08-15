@@ -1,0 +1,39 @@
+---
+import Base from '../layouts/Base.astro'
+import { site, services } from '../data/site'
+const title = `Contact | ${site.name}`
+const description = `Get in touch with Red Dragon Electrix. Call ${site.phone.display} or email for a free quote. Servicing West Auckland and the wider Auckland region.`
+---
+<Base title={title} description={description} path="/contact/">
+  <header class="site-header">
+    <a href="/" class="brand" aria-label={`${site.name} home`}>
+      <img src="/img/logo.png" alt={site.legalName} width="140" height="97" />
+    </a>
+    <nav aria-label="Main">
+      <ul>
+        {services.map((s) => <li><a href={`/${s.slug}/`}>{s.navLabel}</a></li>)}
+        <li><a href="/contact/" aria-current="page">Contact</a></li>
+      </ul>
+    </nav>
+    <a class="call-cta" href={site.phone.href}>Call {site.phone.display}</a>
+  </header>
+  <main id="main">
+    <h1>Contact us</h1>
+    <p class="lede">Call Nick directly for a free, no-obligation quote.</p>
+    <ul class="contact-list">
+      <li><a href={site.phone.href}><span>Phone</span><strong>{site.phone.display}</strong></a></li>
+      <li><a href={`mailto:${site.email}?subject=Website%20enquiry`}><span>Email</span><strong>{site.email}</strong></a></li>
+      <li><a href={site.facebook} rel="noopener"><span>Facebook</span><strong>/reddragonelectrix</strong></a></li>
+      <li><span>Based in</span><strong>{site.address.locality}, {site.address.region}</strong></li>
+    </ul>
+    {/* TODO: enquiry form once the mail path is decided. The old form silently died in April 2024
+        and nobody noticed for 28 months — this one gets monitoring before it ships. */}
+  </main>
+  <footer class="site-footer">
+    <p>&copy; {new Date().getFullYear()} {site.legalName}.</p>
+  </footer>
+  <nav class="call-bar" aria-label="Quick contact">
+    <a href={site.phone.href}>Call now</a>
+    <a href={`mailto:${site.email}?subject=Website%20enquiry`}>Email</a>
+  </nav>
+</Base>

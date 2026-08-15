@@ -1,0 +1,90 @@
+---
+import Base from '../layouts/Base.astro'
+import { site, services, reviews } from '../data/site'
+
+export function getStaticPaths() {
+  return services.map((service) => ({
+    params: { slug: service.slug },
+    props: { service },
+  }))
+}
+
+const { service } = Astro.props
+
+// Every page gets a hand-written description. The old site auto-generated these and ended up
+// showing scraped navigation text in Google results for three of its four pages.
+const title = `${service.title} Auckland | ${site.name}`
+const description = `${service.description} Call ${site.phone.display} for a free quote.`
+---
+
+<Base title={title} description={description} path={`/${service.slug}/`} ogImage={service.image}>
+  <header class="site-header">
+    <a href="/" class="brand" aria-label={`${site.name} home`}>
+      <img src="/img/logo.png" alt={site.legalName} width="140" height="97" />
+    </a>
+    <nav aria-label="Main">
+      <ul>
+        {services.map((s) => (
+          <li>
+            <a href={`/${s.slug}/`} aria-current={s.slug === service.slug ? 'page' : undefined}>
+              {s.navLabel}
+            </a>
+          </li>
+        ))}
+        <li><a href="/contact/">Contact</a></li>
+      </ul>
+    </nav>
+    <a class="call-cta" href={site.phone.href}>Call {site.phone.display}</a>
+  </header>
+
+  <main id="main">
+    <section class="hero hero--service">
+      <img src={service.image} alt="" class="hero-bg" aria-hidden="true" />
+      <div class="hero-content">
+        <p class="eyebrow">Auckland-wide</p>
+        {/* Exactly one h1 per page. The old site had three on some pages. */}
+        <h1>{service.title}</h1>
+        <p class="lede">{service.description}</p>
+        <a class="btn-call" href={site.phone.href}>{site.phone.display}</a>
+      </div>
+    </section>
+
+    <section class="service-detail" aria-labelledby="detail-h">
+      <h2 id="detail-h">What we cover</h2>
+      <ul class="tick-list">
+        {service.items.map((item) => <li>{item}</li>)}
+      </ul>
+    </section>
+
+    <section class="proof" aria-labelledby="proof-h">
+      <h2 id="proof-h">Rated {site.rating.value}.0 from {site.rating.count} reviews</h2>
+      <ul class="review-grid">
+        {reviews.slice(0, 2).map((r) => (
+          <li>
+            <blockquote>
+              <span class="stars" aria-label={`${r.rating} out of 5 stars`}>★★★★★</span>
+              <p>{r.body}</p>
+              <cite>{r.author}</cite>
+            </blockquote>
+          </li>
+        ))}
+      </ul>
+    </section>
+
+    <section class="contact-close" aria-labelledby="contact-h">
+      <h2 id="contact-h">Get a free quote</h2>
+      <p>Call Nick directly, or send an email and he'll get back to you.</p>
+      <a class="btn-call" href={site.phone.href}>{site.phone.display}</a>
+      <a class="btn-secondary" href={`mailto:${site.email}?subject=${encodeURIComponent(service.title + ' enquiry')}`}>Email us</a>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <p>&copy; {new Date().getFullYear()} {site.legalName}. Registered electricians, Auckland, New Zealand.</p>
+  </footer>
+
+  <nav class="call-bar" aria-label="Quick contact">
+    <a href={site.phone.href}>Call now</a>
+    <a href={`mailto:${site.email}?subject=Website%20enquiry`}>Email</a>
+  </nav>
+</Base>

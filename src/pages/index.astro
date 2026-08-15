@@ -1,0 +1,95 @@
+---
+import Base from '../layouts/Base.astro'
+import { site, services, reviews } from '../data/site'
+
+const title = 'EV Charger Installation Auckland | Red Dragon Electrix'
+const description =
+  'Manufacturer-trained EV charger installation across Auckland, including Tesla wall connectors. Also switchboards, rewires, lighting and power points. Call 0210 918 6333 for a free quote.'
+---
+
+<Base title={title} description={description} path="/">
+  <header class="site-header">
+    <a href="/" class="brand" aria-label={`${site.name} home`}>
+      <img src="/img/logo.png" alt={site.legalName} width="140" height="97" />
+    </a>
+    <nav aria-label="Main">
+      <ul>
+        {services.map((s) => <li><a href={`/${s.slug}/`}>{s.navLabel}</a></li>)}
+        <li><a href="/contact/">Contact</a></li>
+      </ul>
+    </nav>
+    <a class="call-cta" href={site.phone.href}>Call {site.phone.display}</a>
+  </header>
+
+  <main id="main">
+    <section class="hero">
+      <img src="/img/tesla-charger.jpg" alt="" class="hero-bg" aria-hidden="true" />
+      <div class="hero-content">
+        <p class="eyebrow">Registered electricians · Auckland-wide</p>
+        <h1>{site.tagline}</h1>
+        <p class="tagline-secondary">{site.taglineSecondary}</p>
+        <p class="lede">
+          Tesla wall connectors, Gen 3 units and home charging — plus switchboards, rewires,
+          lighting and power points for homes and businesses right across Auckland.
+        </p>
+        <a class="btn-call" href={site.phone.href}>{site.phone.display}</a>
+        <p class="rating">
+          <span aria-hidden="true">★★★★★</span>
+          <strong>{site.rating.value}.0 out of 5</strong> from {site.rating.count} reviews
+        </p>
+      </div>
+    </section>
+
+    <section class="services" aria-labelledby="services-h">
+      <h2 id="services-h">What we do</h2>
+      <ul class="service-grid">
+        {services.map((s) => (
+          <li>
+            <a href={`/${s.slug}/`}>
+              <img src={s.image} alt="" width="800" height="600" loading="lazy" />
+              <h3>{s.title}</h3>
+              <p>{s.blurb}</p>
+            </a>
+          </li>
+        ))}
+      </ul>
+    </section>
+
+    <section class="proof" aria-labelledby="proof-h">
+      <h2 id="proof-h">What our customers say</h2>
+      <ul class="review-grid">
+        {reviews.slice(0, 3).map((r) => (
+          <li>
+            <blockquote>
+              <span class="stars" aria-label={`${r.rating} out of 5 stars`}>★★★★★</span>
+              <p>{r.body}</p>
+              <cite>{r.author}</cite>
+            </blockquote>
+          </li>
+        ))}
+      </ul>
+    </section>
+
+    <section class="work" aria-labelledby="work-h">
+      <h2 id="work-h">Recent work</h2>
+      <p>Before and after — a full VIR rewire and switchboard replacement.</p>
+      <img src="/img/before-after.jpg" alt="A rewired switchboard shown before and after the work" width="1800" height="1350" loading="lazy" />
+    </section>
+
+    <section class="contact-close" aria-labelledby="contact-h">
+      <h2 id="contact-h">Get in touch</h2>
+      <p>Servicing all of Auckland. Open {site.openingHoursDisplay}.</p>
+      <a class="btn-call" href={site.phone.href}>{site.phone.display}</a>
+      <a class="btn-secondary" href={`mailto:${site.email}?subject=Website%20enquiry`}>Email us</a>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <p>&copy; {new Date().getFullYear()} {site.legalName}. Registered electricians, Auckland, New Zealand.</p>
+  </footer>
+
+  <nav class="call-bar" aria-label="Quick contact">
+    <a href={site.phone.href}>Call now</a>
+    <a href={`mailto:${site.email}?subject=Website%20enquiry`}>Email</a>
+  </nav>
+</Base>

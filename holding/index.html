@@ -1,0 +1,365 @@
+<!doctype html>
+<html lang="en-NZ">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Auckland Electricians | Red Dragon Electrix</title>
+<meta name="description" content="Registered West Auckland electricians. Switchboards, rewires, lighting, power points and EV charger installation for homes and businesses. Call 0210 918 6333 for a free quote.">
+<link rel="icon" href="icon.png" type="image/png">
+<meta name="theme-color" content="#0D0B0B">
+<link rel="canonical" href="https://reddragonelectrix.co.nz/">
+
+<meta property="og:type" content="website">
+<meta property="og:title" content="Auckland Electricians | Red Dragon Electrix">
+<meta property="og:description" content="Registered West Auckland electricians. Switchboards, rewires, lighting, power points and EV chargers. Call 0210 918 6333.">
+<meta property="og:url" content="https://reddragonelectrix.co.nz/">
+<meta property="og:image" content="https://reddragonelectrix.co.nz/hero.jpg">
+<meta property="og:locale" content="en_NZ">
+
+<style>
+:root{
+  --black:#0D0B0B;
+  --panel:#161313;
+  --panel-2:#1E1A19;
+  --line:#2C2624;
+  --white:#F4F0EE;
+  --grey:#A79E9A;
+  --red:#E2352A;
+  --red-bright:#FF5147;
+  --red-deep:#C4241C;
+  --max:1080px;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{
+  margin:0;background:var(--black);color:var(--white);
+  font-family:"Helvetica Neue",Helvetica,Arial,system-ui,sans-serif;
+  font-size:17px;line-height:1.6;-webkit-font-smoothing:antialiased;
+  padding-bottom:76px; /* room for the mobile call bar */
+}
+img{max-width:100%;height:auto;display:block}
+.wrap{max-width:var(--max);margin:0 auto;padding:0 22px}
+h1,h2,h3{text-transform:uppercase;font-weight:800;letter-spacing:-.015em;line-height:1.05;margin:0;text-wrap:balance}
+a{color:var(--red-bright)}
+
+/* ---------- header ---------- */
+header{border-bottom:1px solid var(--line)}
+/* NOTE: vertical padding only — the `padding` shorthand here would wipe out .wrap's side padding */
+.bar{display:flex;align-items:center;justify-content:space-between;gap:18px;padding-top:16px;padding-bottom:16px}
+.logo{width:118px}
+.hdr-call{
+  display:inline-flex;align-items:center;gap:9px;
+  min-height:48px;padding:12px 20px;
+  background:var(--red-deep);color:#fff;text-decoration:none;
+  font-weight:800;text-transform:uppercase;letter-spacing:.05em;font-size:14px;
+  border-radius:2px;
+}
+.hdr-call:hover,.hdr-call:focus{background:var(--red)}
+@media (max-width:620px){.hdr-call span.long{display:none}}
+
+/* ---------- hero ---------- */
+.hero{position:relative;border-bottom:1px solid var(--line)}
+.hero-img{
+  position:absolute;inset:0;width:100%;height:100%;object-fit:cover;
+  opacity:.42;filter:grayscale(.15);
+}
+.hero-inner{position:relative;padding-top:64px;padding-bottom:60px;max-width:704px}
+.kicker{
+  display:inline-block;font-size:12px;font-weight:700;letter-spacing:.18em;
+  text-transform:uppercase;color:var(--red-bright);margin-bottom:16px;
+}
+h1{font-size:clamp(34px,7.4vw,60px);margin-bottom:18px}
+h1 em{font-style:normal;color:var(--red-bright);display:block}
+.lede{font-size:clamp(17px,2.3vw,20px);color:var(--white);margin:0 0 12px;max-width:46ch}
+.sub{color:var(--grey);margin:0 0 30px;max-width:48ch}
+
+.cta-row{display:flex;flex-wrap:wrap;gap:12px;align-items:center}
+.btn{
+  display:inline-flex;align-items:center;justify-content:center;gap:10px;
+  min-height:60px;padding:16px 30px;border-radius:3px;
+  font-weight:800;text-transform:uppercase;letter-spacing:.06em;
+  text-decoration:none;font-size:17px;
+}
+.btn-primary{background:var(--red-deep);color:#fff}
+.btn-primary:hover,.btn-primary:focus{background:var(--red)}
+.btn-secondary{background:transparent;color:var(--white);border:2px solid var(--line)}
+.btn-secondary:hover,.btn-secondary:focus{border-color:var(--grey)}
+.phone-big{font-size:19px;letter-spacing:.02em}
+
+.stars{display:flex;align-items:center;gap:10px;margin-top:26px;color:var(--grey);font-size:14.5px}
+.stars b{color:var(--white);font-weight:700}
+.star-row{color:var(--red);letter-spacing:2px;font-size:17px}
+
+/* ---------- notice ---------- */
+.notice{
+  background:var(--panel);border-top:1px solid var(--line);border-bottom:1px solid var(--line);
+}
+.notice .wrap{padding-top:20px;padding-bottom:20px;display:flex;gap:14px;align-items:flex-start}
+.notice .dot{width:9px;height:9px;border-radius:50%;background:var(--red);flex:none;margin-top:9px}
+.notice p{margin:0;color:var(--grey);font-size:16px;max-width:70ch}
+.notice strong{color:var(--white)}
+
+/* ---------- sections ---------- */
+section{padding:56px 0}
+h2{font-size:clamp(22px,3.6vw,32px);margin-bottom:8px}
+h2 span{color:var(--red-bright)}
+.sec-sub{color:var(--grey);margin:0 0 30px;max-width:60ch}
+
+.grid-3{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:16px}
+.card{background:var(--panel);border:1px solid var(--line);padding:24px 22px;border-radius:3px}
+.card h3{font-size:19px;color:var(--red-bright);margin-bottom:10px}
+.card p{margin:0;color:var(--grey);font-size:16px}
+
+.services{columns:2;column-gap:34px;margin:0;padding:0;list-style:none}
+@media (max-width:560px){.services{columns:1}}
+.services li{
+  break-inside:avoid;padding:9px 0 9px 26px;position:relative;
+  border-bottom:1px solid var(--line);color:var(--white);font-size:16px;
+}
+.services li::before{content:"";position:absolute;left:0;top:17px;width:12px;height:2px;background:var(--red)}
+
+/* ---------- reviews ---------- */
+.reviews{background:var(--panel-2);border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+.rev-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px}
+blockquote{
+  margin:0;background:var(--black);border:1px solid var(--line);
+  padding:22px;border-radius:3px;display:flex;flex-direction:column;gap:12px;
+}
+blockquote .rate{color:var(--red);letter-spacing:2px;font-size:15px}
+blockquote p{margin:0;color:var(--white);font-size:16px;line-height:1.55}
+blockquote cite{color:var(--grey);font-style:normal;font-size:14px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;margin-top:auto}
+
+/* ---------- contact ---------- */
+.contact-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px}
+.c-item{
+  display:flex;gap:14px;align-items:center;min-height:64px;
+  background:var(--panel);border:1px solid var(--line);
+  padding:16px 20px;border-radius:3px;text-decoration:none;color:var(--white);
+}
+.c-item:hover,.c-item:focus{border-color:var(--red-deep)}
+.c-item .ico{color:var(--red);font-size:20px;flex:none;width:24px;text-align:center}
+.c-item .lbl{display:block;font-size:11.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--grey);margin-bottom:2px}
+.c-item .val{display:block;font-weight:700;font-size:16.5px;overflow-wrap:break-word}
+.c-item .val.email{font-size:14.5px;letter-spacing:-.005em}
+
+/* ---------- sticky mobile call bar ---------- */
+.callbar{
+  position:fixed;left:0;right:0;bottom:0;z-index:50;
+  display:flex;background:var(--red-deep);
+  box-shadow:0 -3px 16px rgba(0,0,0,.5);
+}
+.callbar a{
+  flex:1;display:flex;align-items:center;justify-content:center;gap:10px;
+  min-height:64px;color:#fff;text-decoration:none;
+  font-weight:800;text-transform:uppercase;letter-spacing:.06em;font-size:17px;
+}
+.callbar a+a{border-left:1px solid rgba(0,0,0,.28)}
+@media (min-width:860px){.callbar{display:none} body{padding-bottom:0}}
+
+footer{padding:34px 0 40px;color:var(--grey);font-size:14.5px;border-top:1px solid var(--line)}
+footer p{margin:0 0 6px}
+
+:focus-visible{outline:3px solid var(--red-bright);outline-offset:3px}
+@media (prefers-reduced-motion:no-preference){
+  .btn,.c-item,.hdr-call{transition:background .16s ease,border-color .16s ease}
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap bar">
+    <img src="logo.png" alt="Red Dragon Electrix Ltd" class="logo" width="118">
+    <a class="hdr-call" href="tel:+642109186333">
+      <span aria-hidden="true">&#9742;</span><span class="long">Call&nbsp;</span>0210 918 6333
+    </a>
+  </div>
+</header>
+
+<div class="hero">
+  <img src="hero.jpg" alt="" class="hero-img" aria-hidden="true">
+  <div class="wrap hero-inner">
+    <span class="kicker">Registered electricians &middot; West Auckland</span>
+    <h1>West Auckland's<em>Most Reputable Electricians</em></h1>
+    <p class="lede">Switchboards, rewires, lighting, power points and EV chargers &mdash; for homes and businesses across Auckland.</p>
+    <p class="sub">Qualified, competent and guaranteed to get it right the first time.</p>
+    <div class="cta-row">
+      <a class="btn btn-primary phone-big" href="tel:+642109186333">
+        <span aria-hidden="true">&#9742;</span> 0210 918 6333
+      </a>
+      <a class="btn btn-secondary" href="mailto:dragonelectrix@gmail.com?subject=Website%20enquiry">Email us</a>
+    </div>
+    <p class="stars">
+      <span class="star-row" aria-hidden="true">&#9733;&#9733;&#9733;&#9733;&#9733;</span>
+      <span><b>5.0 out of 5</b> from 9 customer reviews</span>
+    </p>
+  </div>
+</div>
+
+<div class="notice">
+  <div class="wrap">
+    <span class="dot" aria-hidden="true"></span>
+    <p><strong>Our new website is on its way.</strong> In the meantime we're taking calls as usual &mdash; ring Nick on 0210 918 6333 for a free, no-obligation quote.</p>
+  </div>
+</div>
+
+<section>
+  <div class="wrap">
+    <h2>What we <span>do</span></h2>
+    <p class="sec-sub">From a single power point to a full commercial fit-out.</p>
+    <div class="grid-3">
+      <div class="card">
+        <h3>Residential</h3>
+        <p>Reliable, on-time electricians for homes &mdash; maintenance, rewires, lighting and switchboard upgrades.</p>
+      </div>
+      <div class="card">
+        <h3>Commercial</h3>
+        <p>Reliable, quality and expert commercial electricians for fit-outs, lighting and new builds.</p>
+      </div>
+      <div class="card">
+        <h3>EV Chargers</h3>
+        <p>EV charger specialists with manufacturer-specific training, including Tesla wall connectors.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section style="padding-top:0">
+  <div class="wrap">
+    <h2>Services we <span>offer</span></h2>
+    <p class="sec-sub">If it's electrical and it's in Auckland, give us a call.</p>
+    <ul class="services">
+      <li>EV charger installation</li>
+      <li>Switchboard installation &amp; upgrades</li>
+      <li>VIR identification &amp; rewiring</li>
+      <li>LED lighting upgrades</li>
+      <li>New build electrical</li>
+      <li>Power outlets &amp; USB power outlets</li>
+      <li>Home &amp; business lighting</li>
+      <li>Bathroom lighting &amp; ventilation</li>
+      <li>Oven &amp; kitchen appliance installation</li>
+      <li>Heated towel rail installation</li>
+      <li>Ethernet &amp; data connections</li>
+      <li>Residential maintenance</li>
+    </ul>
+  </div>
+</section>
+
+<div class="reviews">
+  <section>
+    <div class="wrap">
+      <h2>What our customers <span>say</span></h2>
+      <p class="sec-sub">Rated 5.0 out of 5 across 9 reviews.</p>
+      <div class="rev-grid">
+        <blockquote>
+          <span class="rate" aria-label="5 out of 5 stars">&#9733;&#9733;&#9733;&#9733;&#9733;</span>
+          <p>&ldquo;Great job installing our Tesla wall connector. Nick was great, very professional. Highly recommended!&rdquo;</p>
+          <cite>Prashant Champa</cite>
+        </blockquote>
+        <blockquote>
+          <span class="rate" aria-label="5 out of 5 stars">&#9733;&#9733;&#9733;&#9733;&#9733;</span>
+          <p>&ldquo;Great communicator, turned up on time and did a great job and left premises clean and tidy. Installed outside power points, heater and replaced two bathroom lights.&rdquo;</p>
+          <cite>Gail Blackwell</cite>
+        </blockquote>
+        <blockquote>
+          <span class="rate" aria-label="5 out of 5 stars">&#9733;&#9733;&#9733;&#9733;&#9733;</span>
+          <p>&ldquo;Did a great job upgrading our switchboard, swapping out all of our lights and replacing a lot of the power points.&rdquo;</p>
+          <cite>Ben Berry</cite>
+        </blockquote>
+      </div>
+    </div>
+  </section>
+</div>
+
+<section>
+  <div class="wrap">
+    <h2>Get in <span>touch</span></h2>
+    <p class="sec-sub">Servicing West Auckland and the wider Auckland region.</p>
+    <div class="contact-grid">
+      <a class="c-item" href="tel:+642109186333">
+        <span class="ico" aria-hidden="true">&#9742;</span>
+        <span><span class="lbl">Phone</span><span class="val">0210 918 6333</span></span>
+      </a>
+      <a class="c-item" href="mailto:dragonelectrix@gmail.com?subject=Website%20enquiry">
+        <span class="ico" aria-hidden="true">&#9993;</span>
+        <span><span class="lbl">Email</span><span class="val email">dragonelectrix@gmail.com</span></span>
+      </a>
+      <a class="c-item" href="https://www.facebook.com/reddragonelectrix" rel="noopener">
+        <span class="ico" aria-hidden="true">&#9679;</span>
+        <span><span class="lbl">Facebook</span><span class="val">/reddragonelectrix</span></span>
+      </a>
+      <div class="c-item">
+        <span class="ico" aria-hidden="true">&#9906;</span>
+        <span><span class="lbl">Based in</span><span class="val">Glen Eden, Auckland</span></span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <p>&copy; <span id="yr">2026</span> Red Dragon Electrix Limited. Registered electricians, Auckland, New Zealand.</p>
+    <p>Full website coming soon.</p>
+  </div>
+</footer>
+
+<nav class="callbar" aria-label="Quick contact">
+  <a href="tel:+642109186333"><span aria-hidden="true">&#9742;</span> Call now</a>
+  <a href="mailto:dragonelectrix@gmail.com?subject=Website%20enquiry"><span aria-hidden="true">&#9993;</span> Email</a>
+</nav>
+
+<script>document.getElementById('yr').textContent = new Date().getFullYear();</script>
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Electrician",
+  "name": "Red Dragon Electrix Limited",
+  "url": "https://reddragonelectrix.co.nz/",
+  "image": "https://reddragonelectrix.co.nz/hero.jpg",
+  "logo": "https://reddragonelectrix.co.nz/logo.png",
+  "telephone": "+64 21 0918 6333",
+  "email": "dragonelectrix@gmail.com",
+  "priceRange": "$$",
+  "address": {
+    "@type": "PostalAddress",
+    "addressLocality": "Glen Eden",
+    "addressRegion": "Auckland",
+    "addressCountry": "NZ"
+  },
+  "areaServed": [
+    { "@type": "Place", "name": "West Auckland" },
+    { "@type": "City", "name": "Auckland" }
+  ],
+  "sameAs": ["https://www.facebook.com/reddragonelectrix"],
+  "aggregateRating": {
+    "@type": "AggregateRating",
+    "ratingValue": "5",
+    "bestRating": "5",
+    "reviewCount": "9"
+  },
+  "review": [
+    {
+      "@type": "Review",
+      "author": { "@type": "Person", "name": "Prashant Champa" },
+      "reviewRating": { "@type": "Rating", "ratingValue": "5", "bestRating": "5" },
+      "reviewBody": "Great job installing our Tesla wall connector. Nick was great, very professional. Highly recommended!"
+    },
+    {
+      "@type": "Review",
+      "author": { "@type": "Person", "name": "Gail Blackwell" },
+      "reviewRating": { "@type": "Rating", "ratingValue": "5", "bestRating": "5" },
+      "reviewBody": "Great communicator, turned up on time and did a great job and left premises clean and tidy."
+    },
+    {
+      "@type": "Review",
+      "author": { "@type": "Person", "name": "Ben Berry" },
+      "reviewRating": { "@type": "Rating", "ratingValue": "5", "bestRating": "5" },
+      "reviewBody": "Did a great job upgrading our switchboard, swapping out all of our lights and replacing a lot of the power points."
+    }
+  ]
+}
+</script>
+
+</body>
+</html>
