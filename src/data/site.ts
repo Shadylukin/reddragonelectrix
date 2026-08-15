@@ -62,9 +62,16 @@ export const site = {
   openingHours: 'Mo-Su 07:00-19:00' as string | null,
   openingHoursDisplay: '7am – 7pm, 7 days',
 
-  // TODO: still unknown. Both are strong trust signals — worth getting from Nick.
-  ewrbRegistration: null as string | null,
+  // Confirmed by Nick: EWRB registered electrician, E269419.
+  // The compliance section invites people to verify this on ewrb.govt.nz, so it
+  // must be his real number — an invitation that resolves to nothing is worse
+  // than no invitation.
+  ewrbRegistration: 'E269419' as string | null,
+  ewrbClass: 'Electrician',
+
+  // TODO: still unknown — asked. Cover amount only, never the policy number.
   insured: null as boolean | null,
+  insuranceCover: null as string | null,
 
   rating: {
     value: 5,
