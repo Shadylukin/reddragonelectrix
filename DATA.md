@@ -17,6 +17,21 @@ Every enquiry stores, in Cloudflare **D1** (`rde-enquiries`, database `e2b496de-
 | `ai_summary`, `ai_priority` | Gemini 3.7 Flash, derived from the above | **yes**, derived |
 | `user_agent`, `source_page`, `created_at` | request headers | low sensitivity |
 
+### Photos
+
+Customers can attach up to 4 photos (switchboard, parking spot). These are:
+
+- **resized in the browser** before upload — max 1600px, JPEG q0.72 — so a 4MB phone
+  photo never leaves their device at full size, and never costs them mobile data
+- **sent to Gemini** for a description that goes to Nick only, never to the customer
+- **attached to Nick's notification email**
+- **never stored by us.** No bucket, no database blob, no retention policy needed
+
+That last point is deliberate. A photograph of the inside of someone's house is the most
+sensitive thing this site touches. Not retaining it removes the retention question, the
+access question and the breach question in one decision. The only copy lives in Nick's
+inbox, alongside everything else about the job.
+
 **Not collected:** no analytics, no cookies, no tracking pixels, no IP logging beyond
 Cloudflare's own edge logs. The site sets no cookies at all, which is why there is no
 cookie banner.

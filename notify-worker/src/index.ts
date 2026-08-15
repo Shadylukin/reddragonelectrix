@@ -4,15 +4,19 @@
  * 1. NOTIFICATION RELAY (fetch). Cloudflare Pages Functions cannot carry a
  *    [[send_email]] binding; Workers can. The site's /api/enquiry posts here and
  *    this delivers through Cloudflare Email Routing — no third-party mail vendor.
+ *    Customer photos arrive as base64 and are attached to the message. They are
+ *    never written to storage: a photograph of the inside of someone's house is
+ *    the most sensitive thing this site handles, and the safest place for it is
+ *    Nick's inbox rather than a bucket somebody has to secure, retain and
+ *    eventually breach.
  *
  * 2. WATCHDOG (scheduled, every 6h). Posts a REAL enquiry end to end, confirms the
  *    row lands, confirms notify_status flips to 'sent', then deletes it. Alerts if
  *    any leg is broken, or if no genuine enquiry has arrived in 21 days.
  *
- *    This exists because of April 2024. The old site's failure was invisible: the
- *    form was broken and nothing said so, because nothing was checking. A health
- *    endpoint that returns 200 while the form is broken is what already existed.
- *    Only a real transaction, watched from outside, catches that class of failure.
+ *    This exists because of April 2024. A health endpoint that returns 200 while
+ *    the form is broken is what already existed. Only a real transaction, watched
+ *    from outside, catches that class of failure.
  */
 
 interface Env {
@@ -21,11 +25,19 @@ interface Env {
   DB: D1Database
 }
 
+interface Attachment {
+  filename: string
+  contentType: string
+  base64: string
+}
+
 const TO = 'dragonelectrix@gmail.com'
 const FROM = 'enquiries@reddragonelectrix.co.nz'
 const SITE = 'https://reddragonelectrix.co.nz'
 const WATCHDOG_NAME = '__watchdog__'
 const QUIET_DAYS = 21
+const MAX_ATTACH = 4
+const MAX_TOTAL_BYTES = 12 * 1024 * 1024
 
 function encodeHeader(s: string): string {
   if (/^[\x00-\x7F]*$/.test(s)) return s
@@ -35,19 +47,62 @@ function encodeHeader(s: string): string {
   return `=?UTF-8?B?${btoa(bin)}?=`
 }
 
-async function sendMail(env: Env, subject: string, text: string, replyTo?: string) {
+/** base64 must be wrapped at 76 chars for RFC 2045 compliance. */
+function wrap76(s: string): string {
+  return (s.match(/.{1,76}/g) ?? []).join('\r\n')
+}
+
+function safeFilename(name: string, i: number): string {
+  const clean = name.replace(/[^A-Za-z0-9._-]/g, '_').slice(0, 60)
+  return /\.(jpe?g|png|webp|heic)$/i.test(clean) ? clean : `photo-${i + 1}.jpg`
+}
+
+async function sendMail(
+  env: Env,
+  subject: string,
+  text: string,
+  replyTo?: string,
+  attachments: Attachment[] = [],
+) {
   const { EmailMessage } = await import('cloudflare:email')
-  const headers = [
+
+  const base = [
     `From: Red Dragon Electrix <${FROM}>`,
     `To: <${TO}>`,
     `Subject: ${encodeHeader(subject)}`,
     replyTo ? `Reply-To: <${replyTo}>` : null,
     'MIME-Version: 1.0',
-    'Content-Type: text/plain; charset=utf-8',
-  ]
-    .filter(Boolean)
-    .join('\r\n')
-  await env.NOTIFY.send(new EmailMessage(FROM, TO, `${headers}\r\n\r\n${text}`))
+  ].filter(Boolean)
+
+  let raw: string
+  if (!attachments.length) {
+    raw = [...base, 'Content-Type: text/plain; charset=utf-8', '', text].join('\r\n')
+  } else {
+    const b = `----rde-${crypto.randomUUID()}`
+    const parts: string[] = [
+      ...base,
+      `Content-Type: multipart/mixed; boundary="${b}"`,
+      '',
+      `--${b}`,
+      'Content-Type: text/plain; charset=utf-8',
+      '',
+      text,
+    ]
+    attachments.forEach((a, i) => {
+      parts.push(
+        `--${b}`,
+        `Content-Type: ${a.contentType}; name="${safeFilename(a.filename, i)}"`,
+        'Content-Transfer-Encoding: base64',
+        `Content-Disposition: attachment; filename="${safeFilename(a.filename, i)}"`,
+        '',
+        wrap76(a.base64),
+      )
+    })
+    parts.push(`--${b}--`, '')
+    raw = parts.join('\r\n')
+  }
+
+  await env.NOTIFY.send(new EmailMessage(FROM, TO, raw))
 }
 
 export default {
@@ -57,16 +112,33 @@ export default {
       return new Response('forbidden', { status: 403 })
     }
 
-    let body: { subject?: string; text?: string; replyTo?: string }
+    let body: { subject?: string; text?: string; replyTo?: string; attachments?: Attachment[] }
     try {
       body = await request.json()
     } catch {
       return new Response('bad request', { status: 400 })
     }
 
+    // Cap attachments defensively — the caller already validates, but this Worker
+    // is reachable independently and must not be turned into a mail bomb.
+    let total = 0
+    const attachments = (body.attachments ?? [])
+      .slice(0, MAX_ATTACH)
+      .filter((a) => {
+        if (!a?.base64 || !/^image\//.test(a.contentType || '')) return false
+        total += a.base64.length
+        return total <= MAX_TOTAL_BYTES
+      })
+
     try {
-      await sendMail(env, (body.subject || 'Website enquiry').slice(0, 200), (body.text || '').slice(0, 20_000), body.replyTo)
-      return Response.json({ ok: true })
+      await sendMail(
+        env,
+        (body.subject || 'Website enquiry').slice(0, 200),
+        (body.text || '').slice(0, 20_000),
+        body.replyTo,
+        attachments,
+      )
+      return Response.json({ ok: true, attached: attachments.length })
     } catch (err) {
       return Response.json({ ok: false, error: String(err).slice(0, 300) }, { status: 502 })
     }
@@ -78,7 +150,6 @@ export default {
         const problems: string[] = []
         let id: string | null = null
 
-        // --- leg 1: can the public form actually accept a submission? ---
         try {
           const r = await fetch(`${SITE}/api/enquiry`, {
             method: 'POST',
@@ -101,9 +172,8 @@ export default {
           problems.push(`form POST threw: ${String(err).slice(0, 120)}`)
         }
 
-        // --- leg 2: did the row land, and did the notification actually go? ---
         if (id) {
-          await new Promise((res) => setTimeout(res, 15_000)) // let waitUntil finish
+          await new Promise((res) => setTimeout(res, 15_000))
           try {
             const row = await env.DB.prepare(
               `SELECT ai_status, notify_status FROM enquiries WHERE id = ?`,
@@ -121,9 +191,6 @@ export default {
           } catch { /* leaves one tidy-up row; not worth alerting over */ }
         }
 
-        // --- leg 3: has any REAL enquiry arrived lately? ---
-        // The April 2024 failure was 28 months of silence that looked like a quiet
-        // patch. This is the check that would have caught it.
         let quiet = ''
         try {
           const row = await env.DB.prepare(

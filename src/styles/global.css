@@ -553,3 +553,26 @@ section { padding-block: 52px; }
 }
 .enq-receipt-head .ref { color: var(--red-lite); }
 .enq-receipt .schedule { margin: 0; padding: 4px 16px 14px; }
+
+/* ---------- photo upload ---------- */
+.enq-photos > span em { font-style: normal; color: var(--mute); font-weight: 400; }
+.enq-hint-tight { margin: 0 0 12px; }
+.photo-drop {
+  display: flex; align-items: center; gap: 14px; cursor: pointer;
+  border: 1px dashed var(--rule-2); background: var(--ink);
+  padding: 16px 18px; min-height: 60px;
+}
+.photo-drop:hover, .photo-drop:focus-within { border-color: var(--red); }
+.photo-drop input { position: absolute; opacity: 0; width: 1px; height: 1px; }
+.photo-cta { font-size: 16px; font-weight: 700; color: var(--white); }
+.photo-hint { font-family: var(--mono); font-size: 11px; font-weight: 700; letter-spacing: 0.14em; color: var(--mute); margin-left: auto; }
+.photo-list { list-style: none; margin: 10px 0 0; padding: 0; display: grid; gap: 8px; }
+.photo-list li {
+  display: flex; align-items: center; gap: 12px; padding: 10px 14px;
+  background: var(--plate); border: 1px solid var(--rule); font-size: 15px; color: var(--body);
+}
+.photo-list li span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.photo-list button {
+  margin-left: auto; background: none; border: 0; color: var(--red-lite);
+  font: inherit; font-size: 14.5px; cursor: pointer; min-height: 44px; padding: 0 4px;
+}

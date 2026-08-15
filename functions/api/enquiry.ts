@@ -52,8 +52,22 @@ function json(body: unknown, status = 200): Response {
   })
 }
 
-/** Ask the model for a briefing. Returns null on any failure — never throws. */
-async function triage(env: Env, e: Record<string, unknown>): Promise<{ summary: string; priority: string } | null> {
+interface Photo { name: string; type: string; b64: string }
+
+/**
+ * Ask the model for a briefing. Returns null on any failure — never throws.
+ *
+ * Photos are included when supplied. The vision read goes to NICK ONLY, never to
+ * the customer — he is looking at the same photograph and is the registered
+ * expert, so he can judge a wrong reading instantly. The reverse (a machine's
+ * verdict on a stranger's switchboard, printed on their screen, under his
+ * registration) is the one thing the design review flatly vetoed.
+ */
+async function triage(
+  env: Env,
+  e: Record<string, unknown>,
+  photos: Photo[] = [],
+): Promise<{ summary: string; priority: string } | null> {
   if (!env.GEMINI_API_KEY) return null
 
   const prompt = `You are triaging a job enquiry for a New Zealand electrician (Red Dragon Electrix, Auckland).
@@ -84,6 +98,19 @@ board to parking distance: ${e.evDistance ?? '-'}
 property type: ${e.evProperty ?? '-'}
 message: ${e.message ?? '(none)'}
 
+${photos.length ? `
+PHOTOS: ${photos.length} attached, sent by the customer.
+Add a short "In the photos:" line describing ONLY what is plainly visible — the
+type of board, whether it looks modern or old, obvious spare ways, the run, where
+the car sits. Rules for this line, absolute:
+- Describe, never conclude. "Looks like a modern board with what may be spare
+  ways" — never "there is capacity" and never "this needs upgrading".
+- Never say anything is safe or unsafe. Nick decides that, on site.
+- If the photo is unclear, dark, or you cannot tell, SAY SO plainly. "Can't tell
+  from this angle" is a useful answer and a wrong guess is not.
+- Nick is looking at the same photograph. You are saving him a squint, not making
+  a judgement for him.` : ''}
+
 Reply as JSON only: {"summary": "...", "priority": "urgent|standard|info"}`
 
   try {
@@ -96,7 +123,12 @@ Reply as JSON only: {"summary": "...", "priority": "urgent|standard|info"}`
         signal: ctl.signal,
         headers: { 'content-type': 'application/json', 'x-goog-api-key': env.GEMINI_API_KEY },
         body: JSON.stringify({
-          contents: [{ parts: [{ text: prompt }] }],
+          contents: [{
+            parts: [
+              { text: prompt },
+              ...photos.map((p) => ({ inline_data: { mime_type: p.type, data: p.b64 } })),
+            ],
+          }],
           generationConfig: {
             temperature: 0.2,
             maxOutputTokens: 2048,
@@ -145,6 +177,7 @@ function buildEmail(e: Record<string, unknown>, ai: { summary: string; priority:
       `Property: ${e.evProperty ?? '-'}`,
     )
   }
+  if (Number(e.photoCount) > 0) lines.push(`Photos:  ${e.photoCount} attached to this email`)
   lines.push('', 'Message:', String(e.message ?? '-'), '', `Ref: ${id}`)
   return { subject, body: lines.join('\n') }
 }
@@ -158,6 +191,17 @@ export const onRequestPost: PagesFunction<Env> = async (ctx) => {
   } catch {
     return json({ ok: false, error: 'Could not read that submission.' }, 400)
   }
+
+  // Photos: capped hard. Anything beyond this is a mistake or an attack, and the
+  // client already resizes before upload.
+  const MAX_PHOTOS = 4
+  const MAX_PHOTO_B64 = 3_000_000 // ~2.2MB decoded, each
+  const photos: Photo[] = Array.isArray(payload.photos)
+    ? (payload.photos as any[])
+        .slice(0, MAX_PHOTOS)
+        .filter((p) => p && typeof p.b64 === 'string' && /^image\/(jpeg|png|webp)$/.test(p.type || '') && p.b64.length <= MAX_PHOTO_B64)
+        .map((p, i) => ({ name: String(p.name || `photo-${i + 1}.jpg`).slice(0, 80), type: p.type, b64: p.b64 }))
+    : []
 
   // Honeypot — a real person never fills this in.
   if (clean(payload.company, 'name')) return json({ ok: true, id: 'ignored' })
@@ -175,7 +219,7 @@ export const onRequestPost: PagesFunction<Env> = async (ctx) => {
     evProperty: clean(payload.evProperty, 'evProperty'),
     sourcePage: clean(payload.sourcePage, 'sourcePage'),
     okToText: payload.okToText === 'yes' || payload.okToText === true ? 1 : 0,
-    photoCount: Number.isFinite(payload.photoCount) ? Math.min(Number(payload.photoCount), 20) : 0,
+    photoCount: photos.length,
   }
 
   // A way to contact him back is the only genuinely required field.
@@ -213,7 +257,7 @@ export const onRequestPost: PagesFunction<Env> = async (ctx) => {
   // effect of being safer.
   ctx.waitUntil(
     (async () => {
-      const ai = await triage(env, e)
+      const ai = await triage(env, e, photos)
       try {
         await env.DB.prepare(
           `UPDATE enquiries SET ai_summary=?, ai_priority=?, ai_status=? WHERE id=?`,
@@ -233,7 +277,12 @@ export const onRequestPost: PagesFunction<Env> = async (ctx) => {
               'content-type': 'application/json',
               'x-notify-secret': env.NOTIFY_SECRET,
             },
-            body: JSON.stringify({ subject, text: body, replyTo: (e.email as string) || undefined }),
+            body: JSON.stringify({
+              subject,
+              text: body,
+              replyTo: (e.email as string) || undefined,
+              attachments: photos.map((p) => ({ filename: p.name, contentType: p.type, base64: p.b64 })),
+            }),
           })
           outcome = r.ok ? 'sent' : 'failed'
         } catch {

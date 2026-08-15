@@ -22,3 +22,10 @@ database_id = "e2b496de-b1cf-48cf-80d6-a2e68b77a47f"
 # Secrets are NOT set here — the repo is public:
 #   wrangler pages secret put GEMINI_API_KEY --project-name=reddragon-electrix
 #   wrangler pages secret put RESEND_API_KEY --project-name=reddragon-electrix
+
+# NOTE: no photo storage binding, deliberately. Customer photos are attached
+# straight to Nick's notification email and never stored by us. Photographs of
+# the inside of someone's house are the most sensitive thing this site handles;
+# not retaining them removes the retention question, the access question and the
+# breach question in one go. Nick keeps them in his inbox, where he already keeps
+# everything else about the job.
