@@ -512,3 +512,9 @@ section { padding-block: 52px; }
 .enq-status.err { color: var(--red-lite); }
 .enq-done { font-size: 17px; line-height: 1.55; margin: 0; color: var(--body); }
 .enq-done strong { color: var(--white); }
+
+/* the briefing echoed back to the customer — the AI made visible */
+.enq-brief { border: 1px solid var(--rule-2); border-left: 4px solid var(--red); background: var(--ink); padding: 16px 16px 14px; margin: 18px 0; }
+.enq-brief-l { display: block; font-family: var(--mono); font-size: 11px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: var(--red-lite); margin-bottom: 8px; }
+.enq-brief p { margin: 0; font-size: 16.5px; line-height: 1.5; color: var(--white); }
+.enq-done-sm { font-size: 15px; color: var(--mute); margin-top: 14px; }

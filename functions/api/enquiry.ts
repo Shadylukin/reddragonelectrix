@@ -201,15 +201,20 @@ export const onRequestPost: PagesFunction<Env> = async (ctx) => {
     )
   }
 
-  // ---- STEPS 3 & 4: best effort, after the response is already guaranteed. ----
+  // ---- STEP 3: triage. Awaited, not deferred, because the customer is shown
+  // the briefing — seeing that they were understood is the trust moment, and it
+  // lets them correct a misreading before Nick acts on it. The durable write has
+  // already happened, so the only thing at risk here is a few seconds of latency.
+  const ai = await triage(env, e)
+  try {
+    await env.DB.prepare(
+      `UPDATE enquiries SET ai_summary=?, ai_priority=?, ai_status=? WHERE id=?`,
+    ).bind(ai?.summary ?? null, ai?.priority ?? null, ai ? 'ok' : (env.GEMINI_API_KEY ? 'failed' : 'skipped'), id).run()
+  } catch { /* the enquiry is already safe */ }
+
+  // ---- STEP 4: notify. Still deferred — the customer should not wait on email.
   ctx.waitUntil(
     (async () => {
-      const ai = await triage(env, e)
-      try {
-        await env.DB.prepare(
-          `UPDATE enquiries SET ai_summary=?, ai_priority=?, ai_status=? WHERE id=?`,
-        ).bind(ai?.summary ?? null, ai?.priority ?? null, ai ? 'ok' : (env.GEMINI_API_KEY ? 'failed' : 'skipped'), id).run()
-      } catch { /* the enquiry is already safe */ }
 
       const { subject, body } = buildEmail(e, ai, id)
       let outcome: 'sent' | 'failed' | 'skipped' = 'skipped'
@@ -243,7 +248,7 @@ export const onRequestPost: PagesFunction<Env> = async (ctx) => {
     })(),
   )
 
-  return json({ ok: true, id })
+  return json({ ok: true, id, summary: ai?.summary ?? null, priority: ai?.priority ?? null })
 }
 
 /** Health endpoint. A monitor hits this; zero enquiries in 30 days is the alarm. */

@@ -115,9 +115,24 @@ const { defaultJobType = 'ev' } = Astro.props
         })
         const data = await r.json()
         if (data.ok) {
+          // Show the customer what was understood. Seeing that you were
+          // understood is the trust moment — and it lets them catch a
+          // misreading before Nick drives across Auckland on it.
+          const urgent = data.priority === 'urgent'
+          const brief = data.summary
+            ? `<div class="enq-brief">
+                 <span class="enq-brief-l">${urgent ? 'Flagged urgent — sent to Nick now' : "What I've passed to Nick"}</span>
+                 <p>${String(data.summary).replace(/[<>]/g, '')}</p>
+               </div>`
+            : ''
           form.querySelector('.enq-body')!.innerHTML =
-            `<p class="enq-done"><strong>Got it.</strong> Nick will come back to you — usually same day.` +
-            ` If it's urgent, ring him on <a href="tel:+642109186333">0210 918 6333</a>.</p>`
+            `<p class="enq-done"><strong>Got it.</strong> ${
+              urgent
+                ? `This one reads as urgent, so ring him as well if you can — <a href="tel:+642109186333">0210 918 6333</a>.`
+                : `Nick will come back to you, usually same day.`
+            }</p>` +
+            brief +
+            `<p class="enq-done enq-done-sm">Not quite right? Ring Nick on <a href="tel:+642109186333">0210 918 6333</a> and he'll sort it.</p>`
         } else {
           status.textContent = data.error || 'Something went wrong. Please ring Nick on 0210 918 6333.'
           status.className = 'enq-status err'
