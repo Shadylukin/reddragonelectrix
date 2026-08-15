@@ -174,6 +174,7 @@ export const onRequestPost: PagesFunction<Env> = async (ctx) => {
     evDistance: clean(payload.evDistance, 'evDistance'),
     evProperty: clean(payload.evProperty, 'evProperty'),
     sourcePage: clean(payload.sourcePage, 'sourcePage'),
+    okToText: payload.okToText === 'yes' || payload.okToText === true ? 1 : 0,
     photoCount: Number.isFinite(payload.photoCount) ? Math.min(Number(payload.photoCount), 20) : 0,
   }
 
@@ -189,13 +190,13 @@ export const onRequestPost: PagesFunction<Env> = async (ctx) => {
   try {
     await env.DB.prepare(
       `INSERT INTO enquiries (id, created_at, name, phone, email, suburb, job_type, message,
-        photo_count, ev_vehicle, ev_charger, ev_distance, ev_property, user_agent, source_page)
-       VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)`,
+        photo_count, ev_vehicle, ev_charger, ev_distance, ev_property, user_agent, source_page, ok_to_text)
+       VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)`,
     )
       .bind(
         id, now, e.name, e.phone, e.email, e.suburb, e.jobType, e.message,
         e.photoCount, e.evVehicle, e.evCharger, e.evDistance, e.evProperty,
-        request.headers.get('user-agent')?.slice(0, 300) ?? null, e.sourcePage,
+        request.headers.get('user-agent')?.slice(0, 300) ?? null, e.sourcePage, e.okToText,
       )
       .run()
   } catch {
@@ -205,20 +206,19 @@ export const onRequestPost: PagesFunction<Env> = async (ctx) => {
     )
   }
 
-  // ---- STEP 3: triage. Awaited, not deferred, because the customer is shown
-  // the briefing — seeing that they were understood is the trust moment, and it
-  // lets them correct a misreading before Nick acts on it. The durable write has
-  // already happened, so the only thing at risk here is a few seconds of latency.
-  const ai = await triage(env, e)
-  try {
-    await env.DB.prepare(
-      `UPDATE enquiries SET ai_summary=?, ai_priority=?, ai_status=? WHERE id=?`,
-    ).bind(ai?.summary ?? null, ai?.priority ?? null, ai ? 'ok' : (env.GEMINI_API_KEY ? 'failed' : 'skipped'), id).run()
-  } catch { /* the enquiry is already safe */ }
-
-  // ---- STEP 4: notify. Still deferred — the customer should not wait on email.
+  // ---- STEPS 3 & 4: deferred. Nothing the model writes reaches the customer, so
+  // there is no reason to make them wait for it. The briefing goes to Nick's phone,
+  // where he is the registered expert who can judge it. The confirmation screen
+  // shows the customer their own answers instead. Form is ~8s faster as a side
+  // effect of being safer.
   ctx.waitUntil(
     (async () => {
+      const ai = await triage(env, e)
+      try {
+        await env.DB.prepare(
+          `UPDATE enquiries SET ai_summary=?, ai_priority=?, ai_status=? WHERE id=?`,
+        ).bind(ai?.summary ?? null, ai?.priority ?? null, ai ? 'ok' : (env.GEMINI_API_KEY ? 'failed' : 'skipped'), id).run()
+      } catch { /* the enquiry is already safe */ }
 
       const { subject, body } = buildEmail(e, ai, id)
       let outcome: 'sent' | 'failed' | 'skipped' = 'skipped'
@@ -272,7 +272,8 @@ export const onRequestPost: PagesFunction<Env> = async (ctx) => {
     })(),
   )
 
-  return json({ ok: true, id, summary: ai?.summary ?? null, priority: ai?.priority ?? null })
+  // Deliberately returns no model output. See the comment on steps 3 & 4.
+  return json({ ok: true, id })
 }
 
 /** Health endpoint. A monitor hits this; zero enquiries in 30 days is the alarm. */

@@ -15,3 +15,14 @@ destination_address = "dragonelectrix@gmail.com"
 
 # NOTIFY_SECRET is a shared secret, set separately, so this is not an open relay:
 #   wrangler secret put NOTIFY_SECRET
+
+# Watchdog. Posts a REAL enquiry end to end every 6 hours, confirms the row lands,
+# confirms notify_status flips, then deletes it. A health endpoint returning 200
+# while the form is broken is exactly what already existed in April 2024.
+[triggers]
+crons = ["0 */6 * * *"]
+
+[[d1_databases]]
+binding = "DB"
+database_name = "rde-enquiries"
+database_id = "e2b496de-b1cf-48cf-80d6-a2e68b77a47f"

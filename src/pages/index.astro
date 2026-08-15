@@ -6,9 +6,9 @@ import CallBar from '../components/CallBar.astro'
 import PlateLabel from '../components/PlateLabel.astro'
 import { site, services, reviews, jobLog, evInstallSpec } from '../data/site'
 
-const title = 'EV Charger Installation Auckland | Red Dragon Electrix'
+const title = 'Auckland Electricians | EV Chargers, Switchboards | Red Dragon Electrix'
 const description =
-  'Manufacturer-trained EV charger installation across Auckland, including Tesla wall connectors. Also switchboards, rewires, lighting and power points. Call 0210 918 6333.'
+  'Registered Auckland electrician. Switchboards, rewires, lighting and power points — and manufacturer-trained EV charger installation including Tesla wall connectors. Call 0210 918 6333.'
 
 const lead = reviews[0]
 const rest = reviews.slice(1, 4)
@@ -45,13 +45,10 @@ const prompts: Record<string, string> = {
 
         <div class="hero-body">
           <h1 class="h1">
-            Need an EV charger fitted in Auckland?
-            <span class="accent">Ring Nick.</span>
+            {site.tagline}
+            <span class="accent">{site.taglineAccent}</span>
           </h1>
-          <p class="hero-sub">
-            Red Dragon Electrix is a registered electrical business run out of Glen Eden.
-            Tesla wall connectors, home chargers, switchboards and rewires — right across Auckland.
-          </p>
+          <p class="hero-sub">{site.taglineSecondary}</p>
 
           <p class="credentials">
             <b>EWRB</b> registered<span class="sep">·</span>

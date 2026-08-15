@@ -1,88 +1,151 @@
 ---
 import { site } from '../data/site'
-interface Props { defaultJobType?: 'ev' | 'residential' | 'commercial' }
-const { defaultJobType = 'ev' } = Astro.props
 ---
 
-<form class="enq" id="enq" novalidate>
+{/*
+  INTENT SPLIT AT QUESTION ONE.
+
+  This is the structural resolution to the whole tension. A frightened homeowner
+  whose switchboard is buzzing never enters the branch that contains a form, a
+  model, or anything clever — she gets a phone number and nothing else. Everything
+  sophisticated lives on the "planning an install" path, where the person is calm,
+  researching, and comparing quotes.
+
+  There is no tone to manage, because the wrong person can no longer reach the
+  wrong surface.
+*/}
+
+<div class="enq" id="enq-root">
   <div class="enq-head">
-    <span class="l">Enquiry</span>
-    <span class="r">Answered 7am – 7pm</span>
+    <span class="l">Get in touch</span>
+    <span class="r">Answered {site.openingHoursDisplay}</span>
   </div>
 
   <div class="enq-body">
-    <p class="enq-intro">
-      Ringing is faster — <a href={site.phone.href}>{site.phone.display}</a>. But if you'd
-      rather type it out, this gets Nick what he needs to price it without a visit.
-    </p>
-
-    <fieldset class="enq-row">
-      <legend>What's the job?</legend>
-      <div class="chips">
-        <label><input type="radio" name="jobType" value="ev" checked={defaultJobType === 'ev'} /><span>EV charger</span></label>
-        <label><input type="radio" name="jobType" value="residential" checked={defaultJobType === 'residential'} /><span>Home</span></label>
-        <label><input type="radio" name="jobType" value="commercial" checked={defaultJobType === 'commercial'} /><span>Business</span></label>
-        <label><input type="radio" name="jobType" value="other" /><span>Something else</span></label>
+    <!-- STEP 1 — intent -->
+    <fieldset class="enq-intent" id="intent-step">
+      <legend class="enq-q">What's going on?</legend>
+      <div class="intent-choices">
+        <button type="button" class="intent" data-intent="fault">
+          <span class="t">Something's wrong right now</span>
+          <span class="s">Tripping, buzzing, burning smell, no power</span>
+        </button>
+        <button type="button" class="intent" data-intent="plan">
+          <span class="t">Planning a job</span>
+          <span class="s">EV charger, switchboard, lighting, rewire</span>
+        </button>
       </div>
     </fieldset>
 
-    <!-- EV qualification. These four answers are what decides the price, and
-         they are the ones customers never volunteer. Shown only for EV. -->
-    <div id="ev-fields" class="enq-ev">
-      <div class="enq-grid">
-        <label class="f"><span>What car?</span><input name="evVehicle" placeholder="Tesla Model 3, BYD, not sure yet" autocomplete="off" /></label>
-        <label class="f"><span>Charger, if you have one</span><input name="evCharger" placeholder="Tesla Gen 3, or not bought yet" autocomplete="off" /></label>
-        <label class="f"><span>Roughly how far is the switchboard from where you park?</span><input name="evDistance" placeholder="About 8 metres, other side of the house…" autocomplete="off" /></label>
-        <label class="f"><span>Property</span>
-          <select name="evProperty">
-            <option value="">Choose…</option>
-            <option>Standalone house</option>
-            <option>Terrace / townhouse</option>
-            <option>Apartment</option>
-            <option>Body corporate</option>
-            <option>Commercial site</option>
-          </select>
-        </label>
-      </div>
-      <p class="enq-hint">
-        Don't know? Leave it blank and text a photo of your switchboard to
-        <a href={`sms:${site.phone.e164}`}>{site.phone.display}</a> — that's usually enough.
+    <!-- FAULT PATH — a phone number and nothing else. No fields. No AI. -->
+    <div class="enq-fault" id="fault-step" hidden>
+      <p class="fault-lead">Don't wait around — ring Nick.</p>
+      <a class="close-cta" href={site.phone.href}>
+        <span class="stack">
+          <span class="l">CALL NICK</span>
+          <span class="d">{site.phone.display}</span>
+        </span>
+        <span class="chev" aria-hidden="true">›</span>
+      </a>
+      <p class="fault-note">
+        If you can smell burning, see smoke or sparks, or someone's had a shock, switch
+        the power off at the board if it's safe to do so. In an emergency ring 111.
       </p>
+      <button type="button" class="enq-back" data-back>← Back</button>
     </div>
 
-    <div class="enq-grid">
-      <label class="f"><span>Your name</span><input name="name" autocomplete="name" /></label>
-      <label class="f"><span>Suburb</span><input name="suburb" placeholder="Glen Eden, Hobsonville…" autocomplete="address-level2" /></label>
-      <label class="f"><span>Phone</span><input name="phone" type="tel" inputmode="tel" autocomplete="tel" /></label>
-      <label class="f"><span>Email</span><input name="email" type="email" inputmode="email" autocomplete="email" /></label>
-    </div>
+    <!-- PLAN PATH — the form -->
+    <form id="enq" class="enq-plan" hidden novalidate>
+      <fieldset class="enq-row">
+        <legend class="enq-q">What sort of job?</legend>
+        <div class="chips">
+          <label><input type="radio" name="jobType" value="ev" checked /><span>EV charger</span></label>
+          <label><input type="radio" name="jobType" value="residential" /><span>Home</span></label>
+          <label><input type="radio" name="jobType" value="commercial" /><span>Business</span></label>
+          <label><input type="radio" name="jobType" value="other" /><span>Something else</span></label>
+        </div>
+      </fieldset>
 
-    <label class="f"><span>What's going on?</span>
-      <textarea name="message" rows="4" placeholder="As much or as little as you like."></textarea>
-    </label>
+      {/* The four answers that actually decide an EV quote, and the four customers
+          never volunteer. Shown only on the EV path. */}
+      <div id="ev-fields" class="enq-ev">
+        <div class="enq-grid">
+          <label class="f"><span>What car?</span><input name="evVehicle" placeholder="Tesla Model 3, BYD, not sure yet" autocomplete="off" /></label>
+          <label class="f"><span>Charger, if you have one</span><input name="evCharger" placeholder="Tesla Gen 3, or not bought yet" autocomplete="off" /></label>
+          <label class="f"><span>Roughly how far is the switchboard from where you park?</span><input name="evDistance" placeholder="About 8 metres, other side of the house…" autocomplete="off" /></label>
+          <label class="f"><span>Property</span>
+            <select name="evProperty">
+              <option value="">Choose…</option>
+              <option>Standalone house</option>
+              <option>Terrace / townhouse</option>
+              <option>Apartment</option>
+              <option>Body corporate</option>
+              <option>Commercial site</option>
+            </select>
+          </label>
+        </div>
+        <p class="enq-hint">
+          Don't know? Leave it blank and text a photo of your switchboard to
+          <a href={`sms:${site.phone.e164}`}>{site.phone.display}</a> — that's usually enough.
+        </p>
+      </div>
 
-    <!-- honeypot: a real person never sees or fills this -->
-    <div class="enq-hp" aria-hidden="true">
-      <label>Company<input name="company" tabindex="-1" autocomplete="off" /></label>
-    </div>
+      <div class="enq-grid">
+        <label class="f"><span>Your name</span><input name="name" autocomplete="name" /></label>
+        <label class="f"><span>Suburb</span><input name="suburb" placeholder="Glen Eden, Hobsonville…" autocomplete="address-level2" /></label>
+        {/* The old form ran for fourteen months with no phone field, in a business
+            whose conversion event is a phone call. */}
+        <label class="f"><span>Phone</span><input name="phone" type="tel" inputmode="tel" autocomplete="tel" /></label>
+        <label class="f"><span>Email</span><input name="email" type="email" inputmode="email" autocomplete="email" /></label>
+      </div>
 
-    <p class="enq-note">Nick needs a phone number or an email to get back to you.</p>
+      <label class="enq-check">
+        <input type="checkbox" name="okToText" value="yes" checked />
+        <span>OK for Nick to text you back</span>
+      </label>
 
-    <button type="submit" class="enq-submit">
-      <span class="l">SEND TO NICK</span>
-      <span class="d">Send enquiry</span>
-    </button>
+      <label class="f"><span>Anything else worth knowing?</span>
+        <textarea name="message" rows="4" placeholder="As much or as little as you like."></textarea>
+      </label>
 
-    <p class="enq-status" id="enq-status" role="status" aria-live="polite"></p>
+      <div class="enq-hp" aria-hidden="true">
+        <label>Company<input name="company" tabindex="-1" autocomplete="off" /></label>
+      </div>
+
+      <p class="enq-note">Nick needs a phone number or an email to get back to you.</p>
+
+      <button type="submit" class="enq-submit">
+        <span class="l">SEND TO NICK</span>
+        <span class="d">Send enquiry</span>
+      </button>
+      <p class="enq-status" id="enq-status" role="status" aria-live="polite"></p>
+      <button type="button" class="enq-back" data-back>← Back</button>
+    </form>
   </div>
-</form>
+</div>
 
 <script>
-  const form = document.getElementById('enq') as HTMLFormElement | null
-  if (form) {
+  const root = document.getElementById('enq-root')
+  if (root) {
+    const intentStep = document.getElementById('intent-step') as HTMLElement
+    const faultStep = document.getElementById('fault-step') as HTMLElement
+    const form = document.getElementById('enq') as HTMLFormElement
     const status = document.getElementById('enq-status')!
-    const evFields = document.getElementById('ev-fields')!
+    const evFields = document.getElementById('ev-fields') as HTMLElement
     const btn = form.querySelector('.enq-submit') as HTMLButtonElement
+
+    const show = (which: 'intent' | 'fault' | 'plan') => {
+      intentStep.hidden = which !== 'intent'
+      faultStep.hidden = which !== 'fault'
+      form.hidden = which !== 'plan'
+    }
+
+    root.querySelectorAll<HTMLButtonElement>('.intent').forEach((b) =>
+      b.addEventListener('click', () => show(b.dataset.intent === 'fault' ? 'fault' : 'plan')),
+    )
+    root.querySelectorAll<HTMLButtonElement>('[data-back]').forEach((b) =>
+      b.addEventListener('click', () => show('intent')),
+    )
 
     const syncEv = () => {
       const v = (form.querySelector('input[name=jobType]:checked') as HTMLInputElement)?.value
@@ -91,10 +154,12 @@ const { defaultJobType = 'ev' } = Astro.props
     form.querySelectorAll('input[name=jobType]').forEach((r) => r.addEventListener('change', syncEv))
     syncEv()
 
+    const esc = (s: string) =>
+      String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]!)
+
     form.addEventListener('submit', async (ev) => {
       ev.preventDefault()
-      const fd = new FormData(form)
-      const payload: Record<string, unknown> = Object.fromEntries(fd.entries())
+      const payload: Record<string, unknown> = Object.fromEntries(new FormData(form).entries())
       payload.sourcePage = location.pathname
 
       if (!String(payload.phone ?? '').trim() && !String(payload.email ?? '').trim()) {
@@ -115,24 +180,39 @@ const { defaultJobType = 'ev' } = Astro.props
         })
         const data = await r.json()
         if (data.ok) {
-          // Show the customer what was understood. Seeing that you were
-          // understood is the trust moment — and it lets them catch a
-          // misreading before Nick drives across Auckland on it.
-          const urgent = data.priority === 'urgent'
-          const brief = data.summary
-            ? `<div class="enq-brief">
-                 <span class="enq-brief-l">${urgent ? 'Flagged urgent — sent to Nick now' : "What I've passed to Nick"}</span>
-                 <p>${String(data.summary).replace(/[<>]/g, '')}</p>
-               </div>`
-            : ''
-          form.querySelector('.enq-body')!.innerHTML =
-            `<p class="enq-done"><strong>Got it.</strong> ${
-              urgent
-                ? `This one reads as urgent, so ring him as well if you can — <a href="tel:+642109186333">0210 918 6333</a>.`
-                : `Nick will come back to you, usually same day.`
-            }</p>` +
-            brief +
-            `<p class="enq-done enq-done-sm">Not quite right? Ring Nick on <a href="tel:+642109186333">0210 918 6333</a> and he'll sort it.</p>`
+          // NO MODEL OUTPUT ON THIS SCREEN. The confirmation shows the customer
+          // their OWN answers and a reference. Anything a model wrote about a
+          // stranger's electrical installation would render under Nick's EWRB
+          // registration, be screenshottable, and differ between two neighbours
+          // who compare notes. The triage still runs — it goes to Nick's phone,
+          // where it belongs.
+          const rows: string[] = []
+          const add = (l: string, v: unknown) => {
+            const s = String(v ?? '').trim()
+            if (s) rows.push(`<div class="row"><dt>${esc(l)}</dt><dd>${esc(s)}</dd></div>`)
+          }
+          add('Name', payload.name)
+          add('Phone', payload.phone)
+          add('Email', payload.email)
+          add('Suburb', payload.suburb)
+          if (payload.jobType === 'ev') {
+            add('Vehicle', payload.evVehicle)
+            add('Charger', payload.evCharger)
+            add('Board to parking', payload.evDistance)
+            add('Property', payload.evProperty)
+          }
+
+          root.querySelector('.enq-body')!.innerHTML =
+            `<p class="enq-done"><strong>Sent.</strong> Nick will come back to you — most enquiries get a call the same day.</p>
+             <div class="enq-receipt">
+               <div class="enq-receipt-head">
+                 <span>What you sent</span>
+                 <span class="ref">REF ${esc(String(data.id || '').slice(0, 8).toUpperCase())}</span>
+               </div>
+               <dl class="schedule">${rows.join('')}</dl>
+             </div>
+             <p class="enq-done enq-done-sm">In a hurry, or something looks wrong above? Ring him on
+               <a href="tel:+642109186333">0210 918 6333</a>.</p>`
         } else {
           status.textContent = data.error || 'Something went wrong. Please ring Nick on 0210 918 6333.'
           status.className = 'enq-status err'

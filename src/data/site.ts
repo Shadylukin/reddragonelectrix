@@ -10,14 +10,24 @@ export const site = {
   name: 'Red Dragon Electrix',
   legalName: 'Red Dragon Electrix Limited',
 
-  // POSITIONING CHANGE, Aug 2026. The old site led with "West Auckland's Most Reputable
-  // Electricians". Enquiry data from 2023-24 says that was wrong on both counts:
-  //   - 77 of 96 enquiries (80%) were EV / Tesla charger installations
-  //   - roughly half the named locations were outside West Auckland (Hobsonville was the
-  //     single biggest suburb, then Epsom, Remuera, Parnell, Northcote, Papakura)
-  // So: lead with EV, serve all of Auckland. General electrical still sits underneath.
-  tagline: "Auckland's EV Charger Specialists",
-  taglineSecondary: 'And everything else electrical.',
+  // POSITIONING, Aug 2026, revised twice.
+  //
+  // The old site led with "West Auckland's Most Reputable Electricians". Enquiry data
+  // from 2023-24 said that was wrong on both counts: 77 of 96 enquiries (80%) were EV /
+  // Tesla charger installs, and roughly half came from outside West Auckland.
+  //
+  // So it briefly led with EV only. Then Nick confirmed the 80% was driven by TESLA'S
+  // INSTALLER REFERRAL LIST, which he has since come off. Without that funnel, traffic
+  // shifts toward general search and the Google listing — and "EV Charger Specialists"
+  // as the sole identity risks losing the homeowner whose switchboard is buzzing.
+  //
+  // Final position: registered Auckland electrician WHO SPECIALISES in EV. Both. The EV
+  // page stays strong; it is the differentiator and it is evidence for his Tesla
+  // reapplication.
+  tagline: 'Need a sparky in Auckland?',
+  taglineAccent: 'Ring Nick.',
+  taglineSecondary:
+    "Registered electrician, Glen Eden. Switchboards, rewires and lighting — and Auckland's EV charger specialist.",
   description:
     'Manufacturer-trained EV charger installation across Auckland, including Tesla wall connectors. Plus switchboards, rewires, lighting and power points for homes and businesses.',
   url: 'https://reddragonelectrix.co.nz',

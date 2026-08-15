@@ -51,3 +51,7 @@ SELECT
   MAX(created_at)                                       AS last_enquiry_at,
   SUM(CASE WHEN notify_status = 'failed' THEN 1 ELSE 0 END) AS failed_notifications
 FROM enquiries;
+
+-- Added Aug 2026: consent to text back. The old form never even asked for a
+-- phone number, let alone permission to use it.
+ALTER TABLE enquiries ADD COLUMN ok_to_text INTEGER DEFAULT 0;
